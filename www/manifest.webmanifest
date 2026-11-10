@@ -1,0 +1,29 @@
+{
+  "name": "MDU Navigator",
+  "short_name": "MDU Nav",
+  "description": "Rooms, routes, your next lecture and the MDU bus for Campus Västerås and Eskilstuna (unofficial student prototype).",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f3f1",
+  "theme_color": "#ff4900",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
