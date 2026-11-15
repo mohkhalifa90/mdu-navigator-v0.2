@@ -59,3 +59,6 @@ The official MDU logo is in `www/img/university-logo.png` and is shown in the he
 
 ## Data source
 Floor plans: *Lokalguide Västerås* (MDU, August 2026) and *Lokalguide Eskilstuna* (MDU, April 2026), public PDFs on mdu.se. Bus timetable, opening hours and semester dates from mdu.se (autumn 2026).
+
+## KronoX links on the web version
+Browsers block the web version from reading KronoX directly, so it goes through a small free Cloudflare Worker (`cloudflare-worker.js`, deployed at https://mdu-kronox.maimoha-hess94.workers.dev/). It only forwards KronoX iCal links from webbschema.mdu.se and stores nothing. The Android/iOS app reads KronoX directly and does not use it. The address is set in `ICS_PROXY` in `www/js/app.js`.

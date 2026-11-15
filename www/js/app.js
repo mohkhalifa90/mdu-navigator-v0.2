@@ -5,7 +5,7 @@ const T = {
   next:'Next session',now:'Happening now',later:'Coming up',goTo:'Take me to',online:'Online',deadline:'Deadline',nextDeadline:'Next deadline',
   notMapped:'This room isn’t on the map yet',example:'Example',yours:'Your schedule',
   myCourses:'My courses',addCourse:'Add a course',addHint:'Add each course you take. You can add as many as you like.',
-  linkPh:'Paste a KronoX iCal link',addLink:'Add link',orFile:'or',uploadB:'Upload .ics files from KronoX',
+  linkPh:'Paste a KronoX schedule link',addLink:'Add link',orFile:'or',uploadB:'Upload .ics files from KronoX',
   how1:'Open the course schedule in KronoX on the MDU website',how2:'Choose iCal and copy the link, or download the file',how3:'Add it here. Your schedules stay on this device only',
   remove:'Remove',sure:'Sure? Tap again',refreshAll:'Update all',fromLink:'Link',fromFile:'File',sessions:'{n} sessions',
   noMore:'No upcoming sessions in your schedules',exampleNote:'These are sample sessions so you can see how the app works. Add your own courses below.',
@@ -29,6 +29,7 @@ const T = {
   dataNote:'Maps come from MDU’s public premises guides (Västerås Aug 2026, Eskilstuna Apr 2026). Routes are approximate, so follow the signs too.',
   none:'No results. Try a room code like R2-142 or A2-003.',exampleCourse:'Example course',
   linkFail:'Couldn’t load that link. Check the link and your internet connection.',
+  linkCanvas:'That’s a Canvas page. Open the schedule in KronoX (webbschema.mdu.se) and paste that link instead.',
   linkWeb:'The web version can’t load KronoX links directly. Download the .ics file instead, or use the app.',
   updated:'Updated {t}',otherLang:'Svenska',
   /* opening hours */
@@ -48,7 +49,7 @@ const T = {
   next:'Nästa pass',now:'Pågår nu',later:'Kommande',goTo:'Visa vägen till',online:'Online',deadline:'Inlämning',nextDeadline:'Nästa inlämning',
   notMapped:'Salen finns inte på kartan än',example:'Exempel',yours:'Ditt schema',
   myCourses:'Mina kurser',addCourse:'Lägg till en kurs',addHint:'Lägg till varje kurs du läser. Du kan lägga till hur många du vill.',
-  linkPh:'Klistra in en iCal-länk från KronoX',addLink:'Lägg till länk',orFile:'eller',uploadB:'Ladda upp .ics-filer från KronoX',
+  linkPh:'Klistra in en schemalänk från KronoX',addLink:'Lägg till länk',orFile:'eller',uploadB:'Ladda upp .ics-filer från KronoX',
   how1:'Öppna kursens schema i KronoX på MDU:s webbplats',how2:'Välj iCal och kopiera länken, eller ladda ner filen',how3:'Lägg till den här. Dina scheman sparas bara på den här enheten',
   remove:'Ta bort',sure:'Säker? Tryck igen',refreshAll:'Uppdatera alla',fromLink:'Länk',fromFile:'Fil',sessions:'{n} pass',
   noMore:'Inga kommande pass i dina scheman',exampleNote:'Det här är exempelpass så att du ser hur appen fungerar. Lägg till dina egna kurser nedan.',
@@ -72,6 +73,7 @@ const T = {
   dataNote:'Kartorna kommer från MDU:s offentliga lokalguider (Västerås aug 2026, Eskilstuna apr 2026). Vägarna är ungefärliga, så följ skyltarna också.',
   none:'Inga träffar. Prova en salskod som R2-142 eller A2-003.',exampleCourse:'Exempelkurs',
   linkFail:'Kunde inte hämta länken. Kontrollera länken och din internetanslutning.',
+  linkCanvas:'Det är en Canvas-sida. Öppna schemat i KronoX (webbschema.mdu.se) och klistra in den länken i stället.',
   linkWeb:'Webbversionen kan inte hämta KronoX-länkar direkt. Ladda ner .ics-filen i stället, eller använd appen.',
   updated:'Uppdaterat {t}',otherLang:'English',
   hoursT:'Öppettider',openNow:'Öppet för studenter nu',closedNow:'Stängt för studenter nu',openUntil:'till {t}',opensAt:'öppnar {d} {t}',
@@ -280,10 +282,20 @@ function allEvents(){
 }
 const IS_NATIVE=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
 const httpsify=u=>u.trim().replace(/^webcal:\/\//i,'https://').replace(/^http:\/\//i,'https://');
-async function fetchICS(url){const r=await fetch(httpsify(url),{cache:'no-store'});const ev=r.ok?parseICS(await r.text()):null;if(!ev)throw new Error('bad');return ev;}
+/* Accept the normal KronoX schedule page link too: Schema.jsp (web view) -> SchemaICAL.ics (same courses, calendar format). */
+function kronoxICS(u){
+  u=httpsify(u);
+  if(/(^|\/\/)(canvas|lms)\.mdu\.se/i.test(u)){const e=new Error('canvas');e.canvas=true;throw e;}
+  return u.replace(/\/setup\/jsp\/Schema(HTML|XML)?\.jsp/i,'/setup/jsp/SchemaICAL.ics');
+}
+/* Web only: browsers block reading KronoX directly, so the web version goes through our small Cloudflare relay. */
+const ICS_PROXY='https://mdu-kronox.maimoha-hess94.workers.dev/';
+async function fetchICS(url){const u=kronoxICS(url);
+  const viaProxy=!IS_NATIVE&&ICS_PROXY.startsWith('https://')&&/^https:\/\/webbschema\.mdu\.se\//i.test(u);
+  const r=await fetch(viaProxy?ICS_PROXY.replace(/\/$/,'')+'/?url='+encodeURIComponent(u):u,{cache:'no-store'});const ev=r.ok?parseICS(await r.text()):null;if(!ev)throw new Error('bad');return ev;}
 async function addLink(url,quiet){
-  try{const ev=await fetchICS(url);addSchedule(ev,'link',url.trim());if(!quiet)toast(t('loaded',{n:ev.length}));renderNext();return true;}
-  catch(e){if(!quiet)toast(IS_NATIVE?t('linkFail'):t('linkWeb'));return false;}
+  try{const ev=await fetchICS(url);addSchedule(ev,'link',kronoxICS(url));if(!quiet)toast(t('loaded',{n:ev.length}));renderNext();return true;}
+  catch(e){if(!quiet)toast(e.canvas?t('linkCanvas'):IS_NATIVE?t('linkFail'):t('linkWeb'));return false;}
 }
 async function refreshAll(quiet){
   const links=SCHEDS.filter(s=>s.source==='link'&&s.url);if(!links.length)return;
