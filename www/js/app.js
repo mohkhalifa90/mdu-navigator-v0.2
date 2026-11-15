@@ -29,6 +29,7 @@ const T = {
   dataNote:'Maps come from MDU’s public premises guides (Västerås Aug 2026, Eskilstuna Apr 2026). Routes are approximate, so follow the signs too.',
   none:'No results. Try a room code like R2-142 or A2-003.',exampleCourse:'Example course',
   linkFail:'Couldn’t load that link. Check the link and your internet connection.',
+  a2hsTitle:'Add MDU Navigator to your Home Screen',a2hsIos:'Tap %SHARE% then “Add to Home Screen”. It opens like an app and works offline.',a2hsTip:'Add your courses from the Home Screen app. Courses added here in the browser don’t carry over.',a2hsAndroid:'Install it on your phone. It opens like an app and works offline.',a2hsInstall:'Install',a2hsMenu:'Open the browser menu ⋮ and choose “Add to Home screen” or “Install app”.',a2hsClose:'Not now',
   linkCanvas:'That’s a Canvas page. Open the schedule in KronoX (webbschema.mdu.se) and paste that link instead.',
   linkWeb:'The web version can’t load KronoX links directly. Download the .ics file instead, or use the app.',
   updated:'Updated {t}',otherLang:'Svenska',
@@ -73,6 +74,7 @@ const T = {
   dataNote:'Kartorna kommer från MDU:s offentliga lokalguider (Västerås aug 2026, Eskilstuna apr 2026). Vägarna är ungefärliga, så följ skyltarna också.',
   none:'Inga träffar. Prova en salskod som R2-142 eller A2-003.',exampleCourse:'Exempelkurs',
   linkFail:'Kunde inte hämta länken. Kontrollera länken och din internetanslutning.',
+  a2hsTitle:'Lägg till MDU Navigator på hemskärmen',a2hsIos:'Tryck på %SHARE% och sedan ”Lägg till på hemskärmen”. Den öppnas som en app och fungerar offline.',a2hsTip:'Lägg till dina kurser i appen på hemskärmen. Kurser som lagts till här i webbläsaren följer inte med.',a2hsAndroid:'Installera den på telefonen. Den öppnas som en app och fungerar offline.',a2hsInstall:'Installera',a2hsMenu:'Öppna webbläsarens meny ⋮ och välj ”Lägg till på startskärmen” eller ”Installera app”.',a2hsClose:'Inte nu',
   linkCanvas:'Det är en Canvas-sida. Öppna schemat i KronoX (webbschema.mdu.se) och klistra in den länken i stället.',
   linkWeb:'Webbversionen kan inte hämta KronoX-länkar direkt. Ladda ner .ics-filen i stället, eller använd appen.',
   updated:'Uppdaterat {t}',otherLang:'English',
@@ -451,9 +453,11 @@ function renderInfo(){
   ${det(t('lockT'),`<p class="small">${esc(V?t('lockVas'):t('lockEsk'))}</p><div class="row wrap">${V?mapBtn('U2-039')+mapBtn('R1-302'):mapBtn('A3-009')}</div>`)}
   ${det(t('foodT'),`<div class="list">${V?ext(LINKS.rosenhill,'Restaurang Rosenhill','')+ext(LINKS.prego,'Prego Origo',''):ext(LINKS.verket,'Verket mat & kaffe','')}</div>`)}
   ${det(t('parkT'),`<p class="small">${esc(V?t('parkVas'):t('parkEsk'))}</p>${V?'':`<a class="btn sec" href="${LINKS.parkEsk}" target="_blank" rel="noopener">eskilstuna.se ↗</a>`}`)}
+  ${(typeof a2hsAvailable==='function'&&a2hsAvailable())?`<button class="btn sec" type="button" id="a2hsOpen" style="width:100%;margin-top:12px">📲 ${esc(t('a2hsTitle'))}</button>`:''}
   <p class="note">mdu.se · 2026</p>`;
   el.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{setCampus(b.dataset.c);renderInfo();});
   el.querySelectorAll('[data-room]').forEach(b=>b.onclick=()=>goRoom(BYKEY.get(b.dataset.room)));
+  const ao=el.querySelector('#a2hsOpen');if(ao)ao.onclick=()=>showA2HS();
 }
 
 /* ---------- state ---------- */
@@ -798,7 +802,7 @@ function applyLang(){
   document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t(e.dataset.t));
   document.getElementById('langBtn').textContent=t('otherLang');
   if(target)computeRoute();
-  renderNext();renderPlaces();renderSearch();renderBus();renderInfo();if(view==='map'){renderMap();renderSheet();}
+  renderNext();renderPlaces();renderSearch();renderBus();renderInfo();if(typeof renderA2HS==='function')renderA2HS();if(view==='map'){renderMap();renderSheet();}
 }
 document.getElementById('langBtn').onclick=()=>{lang=lang==='en'?'sv':'en';store.set('mdu.lang',lang);applyLang();};
 /* optional university logo: shown only if www/img/university-logo.png exists (add it only with MDU's permission) */
@@ -816,4 +820,32 @@ if(IS_NATIVE&&window.Capacitor.getPlatform&&window.Capacitor.getPlatform()==='an
   vv.addEventListener('resize',fitVV);fitVV();
   document.addEventListener('focusin',e=>{if(e.target.matches('input'))setTimeout(()=>e.target.scrollIntoView({block:'nearest'}),300);});
 }
+/* Web only: tell people they can add the app to the Home Screen (iPhone: instructions, Android/Chrome: install button) */
+var A2HS={ios:false,prompt:null,manual:false,isIOS:false,installed:false};
+var SHARE_SVG='<svg class="shareic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-label="Share"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M7 10H5v11h14V10h-2"/></svg>';
+function a2hsAvailable(){return !IS_NATIVE&&A2HS&&!A2HS.installed&&(A2HS.isIOS||!!A2HS.prompt||/Android/i.test(navigator.userAgent));}
+function showA2HS(){if(A2HS.isIOS)A2HS.ios=true;else if(!A2HS.prompt)A2HS.manual=true;renderA2HS();}
+function renderA2HS(){
+  const el=document.getElementById('a2hs');if(!el||!A2HS)return;
+  if(!A2HS.ios&&!A2HS.prompt&&!A2HS.manual){el.hidden=true;return;}
+  const msg=A2HS.ios?esc(t('a2hsIos')).replace('%SHARE%',SHARE_SVG):A2HS.prompt?esc(t('a2hsAndroid')):esc(t('a2hsMenu'));
+  el.innerHTML=`<div class="a2hs-t"><img src="icons/icon-192.png" alt=""><b>${esc(t('a2hsTitle'))}</b></div><p>${msg}</p>${A2HS.ios?`<p class="a2hs-tip">${esc(t('a2hsTip'))}</p>`:''}
+    <div class="a2hs-b">${A2HS.prompt?`<button class="btn" type="button" id="a2hsGo">${esc(t('a2hsInstall'))}</button>`:''}<button class="btn ghost" type="button" id="a2hsNo">${esc(t('a2hsClose'))}</button></div>`;
+  el.hidden=false;
+  el.querySelector('#a2hsNo').onclick=()=>{store.set('mdu.a2hs',Date.now());A2HS.ios=false;A2HS.manual=false;renderA2HS();};
+  const go=el.querySelector('#a2hsGo');if(go)go.onclick=async()=>{const p=A2HS.prompt;A2HS.prompt=null;A2HS.manual=false;renderA2HS();p.prompt();try{await p.userChoice;}catch(e){}if(view==='info')renderInfo();};
+}
+(()=>{
+  if(IS_NATIVE)return;
+  const standalone=window.navigator.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);
+  if(standalone){A2HS.installed=true;return;}
+  A2HS.isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  // "Not now" hides the card for 14 days; it can always be opened again from the Student tab
+  const snoozed=Date.now()-(+store.get('mdu.a2hs')||0)<14*864e5;
+  let auto=!snoozed;
+  if(A2HS.isIOS&&auto){A2HS.ios=true;setTimeout(renderA2HS,1500);}
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();A2HS.prompt=e;if(auto)renderA2HS();if(view==='info')renderInfo();});
+  window.addEventListener('appinstalled',()=>{A2HS.installed=true;A2HS.prompt=null;A2HS.manual=false;store.set('mdu.a2hs',Date.now());renderA2HS();if(view==='info')renderInfo();});
+})();
+renderInfo();
 if('serviceWorker' in navigator&&!IS_NATIVE&&(location.protocol==='https:'||location.hostname==='localhost')){navigator.serviceWorker.register('sw.js').catch(()=>{});}
