@@ -1,6 +1,6 @@
 /* ---------- i18n: English and Swedish ---------- */
 const T = {
- en:{appTitle:'MDU Navigator',appSub:'Västerås · Eskilstuna · student prototype',tNext:'Schedule',tSearch:'Search',tMap:'Map',tPlaces:'Places',tBus:'Bus',
+ en:{appTitle:'MDU Navigator',appSub:'Campus Västerås · Eskilstuna',tNext:'Schedule',tSearch:'Search',tMap:'Map',tPlaces:'Places',tBus:'Bus',
   vas:'Västerås',esk:'Eskilstuna',
   next:'Next session',now:'Happening now',later:'Coming up',goTo:'Take me to',online:'Online',deadline:'Deadline',nextDeadline:'Next deadline',
   notMapped:'This room isn’t on the map yet',example:'Example',yours:'Your schedule',
@@ -17,7 +17,8 @@ const T = {
   linkStep:'Take the connecting corridor to {b}, floor {f}',
   minsWalk:'About {n} min walk (estimate)',noRoute:'No route to this place yet. It is marked on the map: {p}.',otherCampus:'This room is in {c}. Check the Bus tab for the MDU bus.',
   pickStart:'Where are you now?',entrances:'Entrances',nearRoom:'I’m next to room…',tapMap:'Pick my spot on the map',tapMapHint:'Tap the room closest to you',
-  setStart:'I’m here',cancel:'Cancel',close:'Close',sameSpot:'You’re already there.',
+  setStart:'Set as my starting point',setStartHint:'New routes will start from this room instead of the entrance.',startSet:'Routes now start from {r}',indoorOnly:'Stay indoors',
+  outStep:'Walk outside from “{from}” to “{to}” (about 1 min)',cancel:'Cancel',close:'Close',sameSpot:'You’re already there.',
   wc:'Toilets',food:'Food & café',quiet:'Quiet spaces',help:'Help & service',aed:'Defibrillators',halls:'Named halls',lib:'Library',entr:'Entrances',
   stairsBy:'the stairs by {r}',stSpiral:'the spiral stairs in the middle',stUA:'the north-west stairs',stUB:'the west stairs (middle)',stUC:'the south-west stairs',stUE:'the east stairs',
   stEW:'the Västra länken stairwell',stEE:'the Östra länken stairwell',stEC:'the lifts by Studenttorget',stES:'the lift by the C building',
@@ -42,7 +43,7 @@ const T = {
   busForNone:'Coming from {from}? No MDU bus that day gets you to {c} in time.',
   termOff:'Outside the semester',holiday:'Public holiday',weekend:'Weekend'
  },
- sv:{appTitle:'MDU Navigator',appSub:'Västerås · Eskilstuna · studentprototyp',tNext:'Schema',tSearch:'Sök',tMap:'Karta',tPlaces:'Platser',tBus:'Buss',
+ sv:{appTitle:'MDU Navigator',appSub:'Campus Västerås · Eskilstuna',tNext:'Schema',tSearch:'Sök',tMap:'Karta',tPlaces:'Platser',tBus:'Buss',
   vas:'Västerås',esk:'Eskilstuna',
   next:'Nästa pass',now:'Pågår nu',later:'Kommande',goTo:'Visa vägen till',online:'Online',deadline:'Inlämning',nextDeadline:'Nästa inlämning',
   notMapped:'Salen finns inte på kartan än',example:'Exempel',yours:'Ditt schema',
@@ -59,7 +60,8 @@ const T = {
   linkStep:'Ta förbindelsegången till {b}, plan {f}',
   minsWalk:'Cirka {n} min promenad (uppskattning)',noRoute:'Ingen vägbeskrivning hit än. Platsen är markerad på kartan: {p}.',otherCampus:'Salen ligger i {c}. Se fliken Buss för MDU-bussen.',
   pickStart:'Var är du nu?',entrances:'Entréer',nearRoom:'Jag står vid sal…',tapMap:'Välj min plats på kartan',tapMapHint:'Tryck på salen närmast dig',
-  setStart:'Jag är här',cancel:'Avbryt',close:'Stäng',sameSpot:'Du är redan där.',
+  setStart:'Använd som startpunkt',setStartHint:'Nya vägar börjar från den här salen i stället för entrén.',startSet:'Vägarna börjar nu från {r}',indoorOnly:'Gå inomhus',
+  outStep:'Gå utomhus från ”{from}” till ”{to}” (cirka 1 min)',cancel:'Avbryt',close:'Stäng',sameSpot:'Du är redan där.',
   wc:'Toaletter',food:'Mat och café',quiet:'Lugna platser',help:'Hjälp och service',aed:'Hjärtstartare',halls:'Salar med namn',lib:'Bibliotek',entr:'Entréer',
   stairsBy:'trappan vid {r}',stSpiral:'spiraltrappan i mitten',stUA:'trappan i nordväst',stUB:'västra trappan (mitten)',stUC:'trappan i sydväst',stUE:'östra trappan',
   stEW:'trapphuset Västra länken',stEE:'trapphuset Östra länken',stEC:'hissarna vid Studenttorget',stES:'hissen vid C-huset',
@@ -136,6 +138,10 @@ vlink(['R1','R2','R3'],['stN','stC','stS']);
 vlink(['U1','U2','U3'],['stA','stB','stC','stE']);
 vlink(['E1','E2','E3','E4'],['stW','stE','stC','stS']);
 addEdge('U2:linkR','R3:ent_u',45); TRANS.set('U2:linkR|R3:ent_u','link');TRANS.set('R3:ent_u|U2:linkR','link');
+/* outdoor shortcut on the ground floor: R Block entrance by R1-121 <-> entrance between T and U (south side) */
+addEdge('R1:ent_n','U1:entS',110); TRANS.set('R1:ent_n|U1:entS','out');TRANS.set('U1:entS|R1:ent_n','out');
+const ENT_LABEL={'R1:ent_n':'ent_rn','U1:entS':'ent_us'};
+let AVOID_OUT=!!store.get('mdu.indoor');
 
 function project(p,a,b){const dx=b.x-a.x,dy=b.y-a.y,L=dx*dx+dy*dy;let u=L?((p.x-a.x)*dx+(p.y-a.y)*dy)/L:0;u=Math.max(0,Math.min(1,u));return{x:a.x+u*dx,y:a.y+u*dy};}
 const ATT=new Map();
@@ -161,7 +167,7 @@ function dijkstra(src,dst){
     if(u===null) return null;
     if(u===dst) break;
     done.add(u);
-    for(const [v,w] of ADJ.get(u)){const nd=du+w;if(nd<(D.get(v)??Infinity)){D.set(v,nd);P.set(v,u);}}
+    for(const [v,w] of ADJ.get(u)){if(AVOID_OUT&&TRANS.get(u+'|'+v)==='out')continue;const nd=du+w;if(nd<(D.get(v)??Infinity)){D.set(v,nd);P.set(v,u);}}
   }
   const path=[dst];while(path[0]!==src)path.unshift(P.get(path[0]));
   return path;
@@ -341,9 +347,106 @@ function openState(){
   const [o2]=studentHours(q);return {open:false,day:cur>=c?t('tomorrow').toLowerCase():t('today').toLowerCase(),at:`${String(o2/60|0).padStart(2,'0')}:${String(o2%60).padStart(2,'0')}`};
 }
 
+/* ---------- Student tab: links, help, safety, campus info (from mdu.se, November 2026) ---------- */
+Object.assign(T.en,{tInfo:'Student',
+  emT:'Emergency',em112:'Call 112',emCrisis:'MDU crisis line',emNote:'For life-threatening incidents, threats, accidents or burglaries, always call SOS Alarm 112 first. Then call MDU’s crisis line.',
+  violT:'Violent incident: run, hide, call 112',viol:['Run if you can, and get to safety. Don’t wait for people who won’t come, and leave your things.','If you can’t run, hide: lock and barricade the door, cover windows, stay away from doors and windows, put your phone on silent and stay quiet.','Call 112 when it is safe: say where you are, what happened, where the attacker is and what weapons they have.'],
+  fireT:'Fire',fire:['Rescue anyone in immediate danger and press the fire alarm button if the alarm hasn’t gone off.','Call 112, even if the alarm has gone off, then MDU’s crisis line, and say where the fire is.','When the alarm sounds, leave by the nearest escape route and go to an assembly point. Follow the evacuation leaders in high-vis vests marked Utrymningsledare.'],
+  bleedT:'Heavy bleeding',bleed:['Make sure you and the injured person are safe, and call 112 or ask someone else to.','Find the bleeding and press hard on the wound with straight arms, using a T-shirt or scarf. Lean in with your body weight.','Keep pressing until the paramedics tell you to stop. Ask someone to press on top of your hands if you get tired.'],
+  aedT:'Defibrillators',aedNote:'Anyone may use a defibrillator. It talks you through every step and only gives a shock when needed.',
+  aedVas:['Main entrance of the U building (the Link)','U building floor 2, main corridor between rooms 013 and 016','Main entrance of the R building','Finnslätten premises (student and staff area)'],
+  aedEsk:['Floor 1 at Studenttorget (Student Centre)','Floor 4, opposite the lifts in the C building'],
+  toolsT:'Study tools',tLadok:'Ladok',tLadokD:'Register for courses and exams, see your results',tKronox:'KronoX',tKronoxD:'Schedules and group room booking',tCanvas:'Canvas',tCanvasD:'Courses, assignments and messages',tPortal:'Student Portal, email and other IT tools',tPortalD:'MDU’s page with direct links to all study tools',
+  tCanvasApp:'Canvas Student app',tCanvasAppD:'Google Play',tLib:'University Library',tLibD:'Search, borrow and renew',tStudent:'Student pages on mdu.se',tStudentD:'Everything about your studies',
+  helpT:'Help and reporting',tHelpdesk:'IT Helpdesk',tStudCentre:'Studenttorget (Student Centre)',tStudCentreD:'Mon–Thu 08–16, Fri 08–15',
+  faultT:'Report a fault in the premises',faultNote:'Email local service first. For urgent problems, call the caretaker on weekdays 08–16. Evenings, nights and weekends: call the property emergency line.',
+  caretaker:'Caretaker',guard:'Security guard',propEm:'Property emergency (after hours)',castle:'Västerås Castle, urgent problems',
+  ajoj:'Report an injury, accident or improvement idea (Aj, Oj, Halloj)',
+  campusT:'Good to know on campus',
+  groupT:'Group rooms',group:['Book in KronoX up to 7 days ahead, at most 2 sessions (4 hours) a day and 8 sessions (16 hours) in total.','If nobody uses a booked room 15 minutes into the time, anyone may use it (not for rooms booked for teaching).','Cancel if you won’t use the room, and leave it clean.'],
+  kitchT:'Student kitchens',kitchVas:'On the entrance floor of the U building and of the R building.',kitchEsk:'On floors 1 and 3.',
+  quietT:'Quiet room',quietVas:'R building, floor 2. Open to everyone at all times; it can’t be booked.',quietEsk:'Room B3-007, floor 3. Open to everyone at all times; it can’t be booked.',
+  restT:'Rest room',restVas:'T1-063, floor 1. Borrow the key or card at Studenttorget for up to 2 hours; bring ID.',restEsk:'A4-062, floor 4. Borrow the key or card at Studenttorget for up to 2 hours; bring ID.',
+  lockT:'Lockers',lockVas:'Borrow for up to 12 hours, by U2-039 and by R1-302. Lock them only with your MDU card.',lockEsk:'Borrow for up to 12 hours, on floor 3 by A3-009. Lock them only with your MDU card.',
+  libT:'Library hours',lib:'Students: every day 07–22 with MDU card and PIN. Public: Mon–Thu 08–19, Fri 08–16.',
+  foodT:'Restaurants and cafés',parkT:'Parking',parkVas:'Pay with Mobill, E-park or Aimo Park depending on the car park. Students get a reduced rate with a parking permit from Studenttorget.',parkEsk:'No parking just for MDU students. See the municipality’s map of car parks and fees.',
+  showMap:'Show on map',call:'Call',email:'Email',web:'Open'});
+Object.assign(T.sv,{tInfo:'Student',
+  emT:'Nödläge',em112:'Ring 112',emCrisis:'MDU:s krisnummer',emNote:'Vid livshotande händelser, hot, olyckor eller inbrott ringer du alltid SOS Alarm 112 först. Ring sedan MDU:s krisnummer.',
+  violT:'Våldsamt angrepp: fly, sök skydd, larma 112',viol:['Fly om du kan och ta dig i säkerhet. Vänta inte på dem som inte vill följa med, och lämna dina saker.','Om du inte kan fly, göm dig: lås och barrikadera dörren, täck fönster, håll dig borta från dörrar och fönster, stäng av ljudet på telefonen och var tyst.','Ring 112 när det är säkert: säg var du är, vad som hänt, var gärningspersonen är och vilka vapen hen har.'],
+  fireT:'Brand',fire:['Rädda den som är i omedelbar fara och tryck på brandlarmsknappen om larmet inte gått.','Ring 112, även om larmet har gått, och sedan MDU:s krisnummer, och berätta var det brinner.','När larmet går: lämna lokalen via närmaste utrymningsväg och gå till en återsamlingsplats. Följ utrymningsledarna i västar märkta Utrymningsledare.'],
+  bleedT:'Kraftig blödning',bleed:['Se till att du och den skadade är i säkerhet, och ring 112 eller be någon annan ringa.','Leta upp blödningen och tryck hårt på såret med raka armar, gärna med en t-shirt eller halsduk. Luta dig in med kroppsvikten.','Fortsätt trycka tills ambulanspersonalen säger att du kan släppa. Be någon trycka ovanpå dina händer om du blir trött.'],
+  aedT:'Hjärtstartare',aedNote:'Alla får använda en hjärtstartare. Den talar om vad du ska göra och ger bara en stöt när det behövs.',
+  aedVas:['Huvudentrén i U-huset (Länken)','U-huset plan 2, huvudkorridoren mellan sal 013 och 016','Huvudentrén i R-huset','Lokalerna på Finnslätten (student- och medarbetarytan)'],
+  aedEsk:['Plan 1 vid Studenttorget','Plan 4, mittemot hissarna i C-huset'],
+  toolsT:'Studieverktyg',tLadok:'Ladok',tLadokD:'Registrera dig på kurser och tentor, se dina resultat',tKronox:'KronoX',tKronoxD:'Scheman och bokning av grupprum',tCanvas:'Canvas',tCanvasD:'Kurser, inlämningar och meddelanden',tPortal:'Studentportalen, mejl och andra IT-verktyg',tPortalD:'MDU:s sida med direktlänkar till alla studieverktyg',
+  tCanvasApp:'Appen Canvas Student',tCanvasAppD:'Google Play',tLib:'Universitetsbiblioteket',tLibD:'Sök, låna och låna om',tStudent:'Studentsidorna på mdu.se',tStudentD:'Allt om dina studier',
+  helpT:'Hjälp och felanmälan',tHelpdesk:'IT-helpdesk',tStudCentre:'Studenttorget',tStudCentreD:'Mån–tor 08–16, fre 08–15',
+  faultT:'Felanmäl lokaler',faultNote:'Mejla lokalservice i första hand. Vid akuta problem: ring vaktmästaren vardagar 08–16. Kvällar, nätter och helger: ring fastighetsjouren.',
+  caretaker:'Vaktmästare',guard:'Väktare',propEm:'Fastighetsjour (utanför kontorstid)',castle:'Västerås slott, akuta problem',
+  ajoj:'Anmäl skada, olycka eller förbättringsförslag (Aj, Oj, Halloj)',
+  campusT:'Bra att veta på campus',
+  groupT:'Grupprum',group:['Boka i KronoX upp till 7 dagar framåt, max 2 pass (4 timmar) per dag och totalt 8 pass (16 timmar).','Används rummet inte 15 minuter in på den bokade tiden får andra använda det (gäller inte rum bokade för undervisning).','Avboka om du inte ska använda rummet, och lämna det rent och snyggt.'],
+  kitchT:'Studentpentryn',kitchVas:'På entréplan i U-huset och i R-huset.',kitchEsk:'På plan 1 och 3.',
+  quietT:'Stilla rummet',quietVas:'Hus R, plan 2. Öppet för alla hela dagen; kan inte bokas.',quietEsk:'Sal B3-007, plan 3. Öppet för alla hela dagen; kan inte bokas.',
+  restT:'Vilrum',restVas:'T1-063, plan 1. Låna nyckel eller passerkort på Studenttorget i upp till 2 timmar; ta med legitimation.',restEsk:'A4-062, plan 4. Låna nyckel eller passerkort på Studenttorget i upp till 2 timmar; ta med legitimation.',
+  lockT:'Låsbara skåp',lockVas:'Lånas i upp till 12 timmar, vid U2-039 och vid R1-302. Lås bara med ditt MDU-kort.',lockEsk:'Lånas i upp till 12 timmar, på plan 3 vid A3-009. Lås bara med ditt MDU-kort.',
+  libT:'Bibliotekets öppettider',lib:'Studenter: alla dagar 07–22 med MDU-kort och PIN. Allmänheten: mån–tor 08–19, fre 08–16.',
+  foodT:'Restauranger och kaféer',parkT:'Parkering',parkVas:'Betala med Mobill, E-park eller Aimo Park beroende på parkering. Studenter betalar reducerat pris med parkeringstillstånd från Studenttorget.',parkEsk:'Det finns ingen parkering just för MDU-studenter. Se kommunens karta över parkeringar och avgifter.',
+  showMap:'Visa på kartan',call:'Ring',email:'Mejla',web:'Öppna'});
+
+const LINKS={canvas:'https://lms.mdu.se/',ladok:'https://www.student.ladok.se/',kronox:'https://webbschema.mdu.se/',
+  it:'https://www.mdu.se/en/malardalen-university/student/practical-things-about-studying/it-for-you-as-a-student',
+  canvasApp:'https://play.google.com/store/apps/details?id=com.instructure.candroid',
+  lib:'https://www.mdu.se/en/malardalen-university/the-university-library',student:'https://www.mdu.se/en/malardalen-university/student',
+  ajoj:'https://www.mdu.se/student/under-studietiden/campus-och-lokaler/anmal-olyckor-eller-ge-forbattringsforslag-pa-studiemiljon',
+  rosenhill:'https://www.hors.se/vasteras/17/2/restaurang-rosenhill/',prego:'https://www.hors.se/vasteras/17/3/prego-origo/',verket:'https://www.hors.se/eskilstuna/17/2/verket/',
+  parkEsk:'https://www.eskilstuna.se/trafik-och-gator/parkering'};
+const PHONES={vas:{caretaker:'021-10 15 05',guard:'021-10 70 40'},esk:{caretaker:'016-15 37 70',guard:'016-15 32 40'},prop:'0771-90 80 00',castle:'018-56 48 28',crisis:'073-960 88 22',helpdesk:'016-15 51 50',studc:'021-10 13 10'};
+const tel=n=>'tel:'+n.replace(/[^\d+]/g,'');
+const ext=(href,title,desc,icon='↗')=>`<a class="item link" href="${href}" target="_blank" rel="noopener"><span class="ico" aria-hidden="true">${icon}</span><span><span class="t">${esc(title)}</span>${desc?`<br><span class="s">${esc(desc)}</span>`:''}</span><span class="tag">${icon==='☎'?t('call'):icon==='✉'?t('email'):t('web')}</span></a>`;
+const phoneRow=(label,n)=>ext(tel(n),label,n,'☎');
+const mailRow=(label,m)=>ext('mailto:'+m,label,m,'✉');
+function mapBtn(code){const r=BYCODE.get(norm(code));return r?`<button class="ghost small" type="button" data-room="${esc(r.key)}">${t('showMap')}: <span class="code">${esc(code)}</span></button>`:'';}
+const det=(title,body,open)=>`<details class="card fold"${open?' open':''}><summary>${esc(title)}</summary><div class="foldbody">${body}</div></details>`;
+const ul=arr=>`<ul class="tight">${arr.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
+
+function renderInfo(){
+  const el=document.getElementById('v-info'),c=campus,V=c==='vas';
+  el.innerHTML=`<div class="seg big" role="group">${['vas','esk'].map(k=>`<button type="button" data-c="${k}" aria-pressed="${k===c}">${t(k)}</button>`).join('')}</div>
+  <div class="card emergency"><div class="eyebrow">${t('emT')}</div>
+    <div class="row wrap" style="margin-top:8px"><a class="btn danger" href="tel:112">☎ ${t('em112')}</a><a class="btn sec" href="${tel(PHONES.crisis)}">${t('emCrisis')} <span class="code">${PHONES.crisis}</span></a></div>
+    <p class="small muted" style="margin:10px 0 0">${t('emNote')}</p></div>
+  ${det(t('violT'),ul(T[lang].viol))}
+  ${det(t('fireT'),ul(T[lang].fire))}
+  ${det(t('bleedT'),ul(T[lang].bleed))}
+  ${det(t('aedT'),ul(V?T[lang].aedVas:T[lang].aedEsk)+`<p class="small muted">${t('aedNote')}</p>`)}
+  <div class="card"><div class="eyebrow">${t('toolsT')}</div><div class="list">
+    ${ext(LINKS.ladok,t('tLadok'),t('tLadokD'))}${ext(LINKS.kronox,t('tKronox'),t('tKronoxD'))}${ext(LINKS.canvas,t('tCanvas'),t('tCanvasD'))}${ext(LINKS.it,t('tPortal'),t('tPortalD'))}
+    ${ext(LINKS.canvasApp,t('tCanvasApp'),t('tCanvasAppD'))}${ext(LINKS.lib,t('tLib'),t('tLibD'))}${ext(LINKS.student,t('tStudent'),t('tStudentD'))}</div></div>
+  <div class="card"><div class="eyebrow">${t('helpT')}</div><div class="list">
+    ${phoneRow(t('tHelpdesk'),PHONES.helpdesk)}${mailRow(t('tHelpdesk'),'helpdesk@mdu.se')}
+    ${phoneRow(t('tStudCentre')+' · '+t('tStudCentreD'),PHONES.studc)}${mailRow(t('tStudCentre'),'studenttorget@mdu.se')}
+    ${ext(LINKS.ajoj,t('ajoj'),'')}</div></div>
+  <div class="card"><div class="eyebrow">${t('faultT')}</div><p class="small muted" style="margin:6px 0 4px">${t('faultNote')}</p><div class="list">
+    ${mailRow('Lokalservice','lokalservice@mdu.se')}${phoneRow(t('caretaker'),PHONES[c].caretaker)}${phoneRow(t('guard'),PHONES[c].guard)}${phoneRow(t('propEm'),PHONES.prop)}${V?phoneRow(t('castle'),PHONES.castle):''}</div></div>
+  <div class="eyebrow">${t('campusT')}</div>
+  ${det(t('groupT'),ul(T[lang].group)+`<a class="btn sec" href="${LINKS.kronox}" target="_blank" rel="noopener">KronoX ↗</a>`)}
+  ${det(t('libT'),`<p class="small">${esc(t('lib'))}</p>`)}
+  ${det(t('kitchT'),`<p class="small">${esc(V?t('kitchVas'):t('kitchEsk'))}</p>`)}
+  ${det(t('quietT'),`<p class="small">${esc(V?t('quietVas'):t('quietEsk'))}</p>${V?'':mapBtn('B3-007')}`)}
+  ${det(t('restT'),`<p class="small">${esc(V?t('restVas'):t('restEsk'))}</p>`)}
+  ${det(t('lockT'),`<p class="small">${esc(V?t('lockVas'):t('lockEsk'))}</p><div class="row wrap">${V?mapBtn('U2-039')+mapBtn('R1-302'):mapBtn('A3-009')}</div>`)}
+  ${det(t('foodT'),`<div class="list">${V?ext(LINKS.rosenhill,'Restaurang Rosenhill','')+ext(LINKS.prego,'Prego Origo',''):ext(LINKS.verket,'Verket mat & kaffe','')}</div>`)}
+  ${det(t('parkT'),`<p class="small">${esc(V?t('parkVas'):t('parkEsk'))}</p>${V?'':`<a class="btn sec" href="${LINKS.parkEsk}" target="_blank" rel="noopener">eskilstuna.se ↗</a>`}`)}
+  <p class="note">mdu.se · 2026</p>`;
+  el.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{setCampus(b.dataset.c);renderInfo();});
+  el.querySelectorAll('[data-room]').forEach(b=>b.onclick=()=>goRoom(BYKEY.get(b.dataset.room)));
+}
+
 /* ---------- state ---------- */
 let view=(location.hash||'').replace('#','')||'next';
-if(!['next','search','map','places','bus'].includes(view))view='next';
+if(!['next','search','map','places','bus','info'].includes(view))view='next';
 let campus=store.get('mdu.campus')||'vas', bld=CAMPUS[campus].blds[0], floor=BUILD[bld].floors[0];
 let target=null, start=store.get('mdu.start2')||null;
 let route=null, tapMode=null, curStep=-1, busFrom=store.get('mdu.busfrom')||'vas';
@@ -359,6 +462,7 @@ function setView(v){
   if(v==='search') renderSearch();
   if(v==='bus') renderBus();
   if(v==='places') renderPlaces();
+  if(v==='info') renderInfo();
 }
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>setView(b.dataset.v));
 
@@ -591,16 +695,18 @@ function computeRoute(){
   const dst=attach(target);if(!src||!dst)return;
   if(src===dst){route={same:true,segs:[],marks:[],steps:[]};return;}
   const path=dijkstra(src,dst);if(!path)return;
-  const segs=[],marks=[],steps=[];let flat=0,changes=0;
+  const segs=[],marks=[],steps=[];let flat=0,changes=0,outdoor=false;
   const fl=fk=>fk.slice(1);
   for(let i=0;i<path.length;i++){
     const p=POS.get(path[i]);
     if(!segs.length||segs[segs.length-1].fk!==p.fk){
       if(segs.length){
         const prev=POS.get(path[i-1]),pid=path[i-1].split(':')[1];
-        if(prev.fk[0]!==p.fk[0]){ // building change via connecting corridor
+        if(prev.fk[0]!==p.fk[0]){ // building change: connecting corridor or a short walk outside
+          const kind=TRANS.get(path[i-1]+'|'+path[i]);
           marks.push({fk:prev.fk,x:prev.x,y:prev.y,sym:'→'},{fk:p.fk,x:p.x,y:p.y,sym:'→'});
-          steps.push({fk:prev.fk,html:t('linkStep',{b:bLabel(p.fk[0]),f:fl(p.fk)})});
+          if(kind==='out'){outdoor=true;steps.push({fk:prev.fk,html:t('outStep',{from:t(ENT_LABEL[path[i-1]]),to:t(ENT_LABEL[path[i]])})});}
+          else steps.push({fk:prev.fk,html:t('linkStep',{b:bLabel(p.fk[0]),f:fl(p.fk)})});
         }else{
           const up=+fl(p.fk)>+fl(prev.fk);
           marks.push({fk:prev.fk,x:prev.x,y:prev.y,sym:up?'↑':'↓'},{fk:p.fk,x:p.x,y:p.y,sym:up?'↑':'↓'});
@@ -614,11 +720,11 @@ function computeRoute(){
     }else flat+=dist(POS.get(path[i-1]),p);
     segs[segs.length-1].pts.push({x:p.x,y:p.y});
   }
-  const meters=flat*0.3+changes*12;
+  const meters=flat*0.3+changes*12+(outdoor?20:0);
   const first={fk:segs[0].fk,html:`${t('startAt')}: <b>${startLabel()}</b> · ${t('floor')} ${fl(segs[0].fk)}`};
   const last={fk:target.fk,html:`${t('walkTo')} <span class="${target.kind?'':'code'}">${esc(dn(target))}</span>, ${t('redMark')}`};
   for(const st of steps) if(st.stair) st.html=`${t('walkTo')} ${stairName(st.fk,st.stair)}, ${st.up?t('takeUp'):t('takeDown')} ${t('toFloor')} ${fl(st.toFk)}`;
-  route={segs,marks,steps:[first,...steps,last],mins:Math.max(1,Math.round(meters/75))};
+  route={segs,marks,steps:[first,...steps,last],mins:Math.max(1,Math.round(meters/75)),outdoor};
 }
 function fitRoute(){
   const s=route&&route.segs.find(s=>s.fk===floor)||route&&route.segs[0];
@@ -640,13 +746,14 @@ function renderSheet(){
     if(route&&route.same) h+=`<p class="small">${t('sameSpot')}</p>`;
     else if(route){
       h+=`<ol class="steps">${route.steps.map((s,i)=>`<li class="${i===curStep?'cur':''}"><button type="button" data-step="${i}"><span class="n">${i+1}</span><span class="small">${s.html}</span></button></li>`).join('')}</ol>
-      <div class="row" style="margin-top:8px"><span class="pill">${t('minsWalk',{n:route.mins})}</span></div>`;
+      <div class="row wrap" style="margin-top:8px"><span class="pill">${t('minsWalk',{n:route.mins})}</span>${target.campus==='vas'?`<label class="chk"><input type="checkbox" id="indoor" ${AVOID_OUT?'checked':''}> ${t('indoorOnly')}</label>`:''}</div>`;
     }
-    h+=`<div class="row" style="margin-top:10px"><button class="btn sec" type="button" id="setHere" style="flex:1">${t('setStart')}</button></div>`;
+    h+=`<div class="starthint"><button class="ghost" type="button" id="setHere">📍 ${t('setStart')}</button><span class="small muted">${t('setStartHint')}</span></div>`;
   }
   sh.innerHTML=h;setSheetH();
   const fb=sh.querySelector('#fromBtn');fb&&(fb.onclick=openStartPicker);
-  const sh2=sh.querySelector('#setHere');sh2&&(sh2.onclick=()=>{const r=target;target=null;route=null;setStart({type:'room',key:r.key});});
+  const ind=sh.querySelector('#indoor');ind&&(ind.onchange=()=>{AVOID_OUT=ind.checked;store.set('mdu.indoor',AVOID_OUT);computeRoute();renderMap();renderSheet();if(route&&!route.same)fitRoute();});
+  const sh2=sh.querySelector('#setHere');sh2&&(sh2.onclick=()=>{const r=target;target=null;route=null;setStart({type:'room',key:r.key});toast(t('startSet',{r:dn(r)}));});
   sh.querySelectorAll('[data-step]').forEach(b=>b.onclick=()=>{curStep=+b.dataset.step;const s=route.steps[curStep];floor=s.fk;bld=s.fk[0];renderMap();renderSheet();fitRoute();});
 }
 function setSheetH(){const sh=document.getElementById('sheet');document.querySelector('.mapwrap').style.setProperty('--sheet-h',sh.offsetHeight+'px');}
@@ -679,7 +786,7 @@ function applyLang(){
   document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t(e.dataset.t));
   document.getElementById('langBtn').textContent=t('otherLang');
   if(target)computeRoute();
-  renderNext();renderPlaces();renderSearch();renderBus();if(view==='map'){renderMap();renderSheet();}
+  renderNext();renderPlaces();renderSearch();renderBus();renderInfo();if(view==='map'){renderMap();renderSheet();}
 }
 document.getElementById('langBtn').onclick=()=>{lang=lang==='en'?'sv':'en';store.set('mdu.lang',lang);applyLang();};
 /* optional university logo: shown only if www/img/university-logo.png exists (add it only with MDU's permission) */
@@ -690,4 +797,11 @@ setView(view);
 setInterval(()=>{if(view==='next')renderNext();if(view==='bus')renderBus();if(view==='places')renderPlaces();},60000);
 refreshAll(true);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){const old=SCHEDS.some(s=>s.source==='link'&&Date.now()-(s.fetched||0)>30*60000);if(old)refreshAll(true);if(view==='next')renderNext();}});
+/* Android app: the keyboard is drawn over the page, so size the app to the visible area */
+if(IS_NATIVE&&window.Capacitor.getPlatform&&window.Capacitor.getPlatform()==='android'&&window.visualViewport){
+  const vv=window.visualViewport;
+  const fitVV=()=>{document.documentElement.style.setProperty('--vvh',vv.height+'px');document.body.classList.toggle('kb',vv.height<window.innerHeight*0.8);};
+  vv.addEventListener('resize',fitVV);fitVV();
+  document.addEventListener('focusin',e=>{if(e.target.matches('input'))setTimeout(()=>e.target.scrollIntoView({block:'nearest'}),300);});
+}
 if('serviceWorker' in navigator&&!IS_NATIVE&&(location.protocol==='https:'||location.hostname==='localhost')){navigator.serviceWorker.register('sw.js').catch(()=>{});}

@@ -28,7 +28,7 @@
   --ok:#46c08a; --ok-soft:#173326; color-scheme:dark;
 }
 *{box-sizing:border-box}
-html,body{height:100%;margin:0}
+html,body{height:var(--vvh,100%);margin:0}
 body{background:var(--bg);padding:max(env(safe-area-inset-top),var(--safe-area-inset-top,0px)) 0 0;color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.5;-webkit-tap-highlight-color:transparent}
 button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
@@ -45,7 +45,7 @@ main{overflow:hidden;position:relative}
 .view{position:absolute;inset:0;overflow-y:auto;padding:16px;display:none;flex-direction:column;gap:14px}
 .view.on{display:flex}
 #v-map.view{padding:0;overflow:hidden}
-nav{display:grid;grid-template-columns:repeat(5,1fr);background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav{display:grid;grid-template-columns:repeat(6,1fr);background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
 nav button{background:none;border:0;padding:8px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;color:var(--muted)}
 nav button svg{width:22px;height:22px}
 nav button[aria-selected="true"]{color:var(--accent);font-weight:600}
@@ -136,3 +136,24 @@ nav button[aria-selected="true"]{color:var(--accent);font-weight:600}
 .dep.past{opacity:.4}.dep.nx{border-color:var(--brand);background:var(--accent-soft)}
 .mapbar .seg button[aria-pressed="true"]{background:var(--ink);color:#fff}
 a.btn{text-decoration:none}
+
+nav button{font-size:11px}
+body.kb nav{display:none}
+.chk{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.chk input{width:18px;height:18px;accent-color:var(--accent)}
+.starthint{display:flex;flex-direction:column;gap:4px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.starthint .ghost{align-self:flex-start}
+.ghost.small{font-size:12px;padding:4px 10px}
+.card.emergency{border-left:4px solid #c62828}
+.btn.danger{background:#c62828;color:#fff;text-decoration:none}
+details.fold{padding:0}
+details.fold summary{padding:13px 14px;font-weight:600;cursor:pointer;list-style:none;display:flex;justify-content:space-between}
+details.fold summary::after{content:'+';color:var(--muted);font-weight:400}
+details.fold[open] summary::after{content:'−'}
+details.fold summary::-webkit-details-marker{display:none}
+.foldbody{padding:0 14px 14px;display:flex;flex-direction:column;gap:8px}
+ul.tight{margin:0;padding-inline-start:18px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+a.item.link{text-decoration:none;color:inherit;grid-template-columns:22px 1fr auto}
+.ico{color:var(--accent);font-weight:700;text-align:center}
+.mark.logo{background:#fff;border-radius:8px;padding:2px 4px;height:40px;width:auto}
+.mark.logo img{height:36px;width:auto;display:block}

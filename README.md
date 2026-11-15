@@ -7,6 +7,8 @@ Unofficial student prototype for **MDU Campus Västerås**. One codebase that ru
 - **Routes:** step by step, across floors and between buildings (U Block floor 2 ↔ R Block floor 3). Every room in both guides is searchable.
 - **MDU bus:** next departure between Västerås and Eskilstuna, today's timetable, the stop, and the last bus that gets you to your next session. Knows weekends, Swedish public holidays and semester dates.
 - **Opening hours:** shows whether campus is open for students right now.
+- **Student tab:** emergency numbers and what to do (violence, fire, bleeding, defibrillators), study tools (Ladok, KronoX, Canvas, library), Helpdesk and Studenttorget, reporting faults in the premises, and campus info (group rooms, kitchens, quiet and rest rooms, lockers, food, parking).
+- **Shortcut outside:** between R Block floor 1 and T/U Block floor 1 the route can go outside; tick *Stay indoors* to use the corridors.
 - **Languages:** English and Swedish, picked from the phone's language.
 - **Privacy:** no account, no server, no tracking. Schedules are stored on the device only.
 
@@ -46,7 +48,7 @@ After any change in `www/`, run `npx cap sync` again. When you change files in `
 - **Web / iPhone without a Mac:** enable GitHub Pages (Settings → Pages → Source: *GitHub Actions*). The *Web version* workflow publishes `www/`. On iPhone, open the link in Safari → Share → **Add to Home Screen**.
 
 ## Logo
-The app uses its own pin icon and MDU-inspired colours. To show the university logo in the header, add `www/img/university-logo.png`; the app picks it up automatically. Only do this with MDU's permission.
+The official MDU logo is in `www/img/university-logo.png` and is shown in the header (added at MDU's request). To change it, replace that file; the app picks it up automatically.
 
 ## Known limits
 - Corridors are simplified, especially in Eskilstuna and T Block. The exam hall and T Block floor 3 are map-only.
