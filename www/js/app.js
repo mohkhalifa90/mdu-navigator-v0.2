@@ -10,7 +10,7 @@ const T = {
   remove:'Remove',sure:'Sure? Tap again',refreshAll:'Update all',fromLink:'Link',fromFile:'File',sessions:'{n} sessions',
   noMore:'No upcoming sessions in your schedules',exampleNote:'These are sample sessions so you can see how the app works. Add your own courses below.',
   today:'Today',tomorrow:'Tomorrow',inX:'in',min:'min',hr:'h',day:'d',endsIn:'ends in',
-  qph:'Search: R2-142, A2-003, Omega, WC…',floor:'Floor',route:'Route',mapOnly:'Map only',
+  qph:'Search: R2-142, A2-003, Omega, WC…',floor:'Floor',darkMode:'Dark mode',lightMode:'Light mode',showSteps:'Show the steps ({n})',showStepsA:'Show the steps',hideStepsA:'Hide the steps',route:'Route',mapOnly:'Map only',
   bR:'R Block',bU:'T/U Block',bE:'Main building',bX:'Exam hall',bRs:'R',bUs:'T/U',bEs:'A·B·C',bXs:'Exam hall',
   from:'From',change:'Change',tapHint:'Tap any room on the map, or find it in Search.',
   startAt:'Start at',takeUp:'go up',takeDown:'go down',toFloor:'to floor',walkTo:'Walk to',redMark:'the orange ring on the map.',
@@ -55,7 +55,7 @@ const T = {
   remove:'Ta bort',sure:'Säker? Tryck igen',refreshAll:'Uppdatera alla',fromLink:'Länk',fromFile:'Fil',sessions:'{n} pass',
   noMore:'Inga kommande pass i dina scheman',exampleNote:'Det här är exempelpass så att du ser hur appen fungerar. Lägg till dina egna kurser nedan.',
   today:'Idag',tomorrow:'Imorgon',inX:'om',min:'min',hr:'tim',day:'d',endsIn:'slutar om',
-  qph:'Sök: R2-142, A2-003, Omega, WC…',floor:'Plan',route:'Väg',mapOnly:'Bara karta',
+  qph:'Sök: R2-142, A2-003, Omega, WC…',floor:'Plan',darkMode:'Mörkt läge',lightMode:'Ljust läge',showSteps:'Visa stegen ({n})',showStepsA:'Visa stegen',hideStepsA:'Dölj stegen',route:'Väg',mapOnly:'Bara karta',
   bR:'Hus R',bU:'Hus T/U',bE:'Huvudbyggnaden',bX:'Tentamenslokal',bRs:'R',bUs:'T/U',bEs:'A·B·C',bXs:'Tenta',
   from:'Från',change:'Ändra',tapHint:'Tryck på en sal på kartan, eller sök efter den under Sök.',
   startAt:'Börja vid',takeUp:'gå upp',takeDown:'gå ner',toFloor:'till plan',walkTo:'Gå till',redMark:'den orange ringen på kartan.',
@@ -384,6 +384,8 @@ Object.assign(T.en,{tInfo:'Student',
   lockT:'Lockers',lockVas:'Borrow for up to 12 hours, by U2-039 and by R1-302. Lock them only with your MDU card.',lockEsk:'Borrow for up to 12 hours, on floor 3 by A3-009. Lock them only with your MDU card.',
   libT:'Library hours',lib:'Students: every day 07–22 with MDU card and PIN. Public: Mon–Thu 08–19, Fri 08–16.',
   foodT:'Restaurants and cafés',parkT:'Parking',parkVas:'Pay with Mobill, E-park or Aimo Park depending on the car park. Students get a reduced rate with a parking permit from Studenttorget.',parkEsk:'No parking just for MDU students. See the municipality’s map of car parks and fees.',
+  tAdm:'University Admissions',tAdmD:'Apply for courses and programmes at MDU and other Swedish universities',
+  cardT:'Lost your MDU card?',card:['Report the loss at Studenttorget. They block the old card so you can order a new one.','Blocking costs SEK 100, paid on site at Studenttorget, and you must show valid ID. It is free if you bring a police report about the loss.','60 minutes after the card is blocked, order a new card yourself (link below). Use a colour photo taken from the front, with both eyes visible and a light background.','Collect the new card at the campus you chose. Bring valid ID; digital ID is not accepted.'],cardOrder:'Order a new MDU card',cardInfo:'The MDU card on mdu.se',
   showMap:'Show on map',call:'Call',email:'Email',web:'Open'});
 Object.assign(T.sv,{tInfo:'Student',
   emT:'Nödläge',em112:'Ring 112',emCrisis:'MDU:s krisnummer',emNote:'Vid livshotande händelser, hot, olyckor eller inbrott ringer du alltid SOS Alarm 112 först. Ring sedan MDU:s krisnummer.',
@@ -407,9 +409,11 @@ Object.assign(T.sv,{tInfo:'Student',
   lockT:'Låsbara skåp',lockVas:'Lånas i upp till 12 timmar, vid U2-039 och vid R1-302. Lås bara med ditt MDU-kort.',lockEsk:'Lånas i upp till 12 timmar, på plan 3 vid A3-009. Lås bara med ditt MDU-kort.',
   libT:'Bibliotekets öppettider',lib:'Studenter: alla dagar 07–22 med MDU-kort och PIN. Allmänheten: mån–tor 08–19, fre 08–16.',
   foodT:'Restauranger och kaféer',parkT:'Parkering',parkVas:'Betala med Mobill, E-park eller Aimo Park beroende på parkering. Studenter betalar reducerat pris med parkeringstillstånd från Studenttorget.',parkEsk:'Det finns ingen parkering just för MDU-studenter. Se kommunens karta över parkeringar och avgifter.',
+  tAdm:'Antagning.se',tAdmD:'Sök kurser och program på MDU och andra svenska lärosäten',
+  cardT:'Tappat ditt MDU-kort?',card:['Anmäl förlusten på Studenttorget. De spärrar det gamla kortet så att du kan beställa ett nytt.','Spärren kostar 100 kronor, som betalas på plats på Studenttorget, och du måste visa giltig legitimation. Den är gratis om du har en polisanmälan om förlusten.','60 minuter efter att kortet spärrats beställer du själv ett nytt kort (länk nedan). Använd ett färgfoto taget rakt framifrån, med båda ögonen synliga och ljus bakgrund.','Hämta det nya kortet på det campus du valt. Ta med giltig legitimation; digitalt ID godkänns inte.'],cardOrder:'Beställ ett nytt MDU-kort',cardInfo:'MDU-kortet på mdu.se',
   showMap:'Visa på kartan',call:'Ring',email:'Mejla',web:'Öppna'});
 
-const LINKS={canvas:'https://lms.mdu.se/',ladok:'https://www.student.ladok.se/',kronox:'https://webbschema.mdu.se/',
+const LINKS={canvas:'https://lms.mdu.se/',adm:{en:'https://www.universityadmissions.se/',sv:'https://www.antagning.se/'},cardOrder:'https://portal.mdu.se/kortbestallning/',cardInfo:{en:'https://www.mdu.se/en/malardalen-university/student/during-your-studies/campus-and-premises/the-mdu-card',sv:'https://www.mdu.se/student/under-studietiden/campus-och-lokaler/mdu-kortet'},ladok:'https://www.student.ladok.se/',kronox:'https://webbschema.mdu.se/',
   it:'https://www.mdu.se/en/malardalen-university/student/practical-things-about-studying/it-for-you-as-a-student',
   canvasApp:'https://play.google.com/store/apps/details?id=com.instructure.candroid',
   lib:'https://www.mdu.se/en/malardalen-university/the-university-library',student:'https://www.mdu.se/en/malardalen-university/student',
@@ -436,8 +440,9 @@ function renderInfo(){
   ${det(t('bleedT'),ul(T[lang].bleed))}
   ${det(t('aedT'),ul(V?T[lang].aedVas:T[lang].aedEsk)+`<p class="small muted">${t('aedNote')}</p>`)}
   <div class="card"><div class="eyebrow">${t('toolsT')}</div><div class="list">
-    ${ext(LINKS.ladok,t('tLadok'),t('tLadokD'))}${ext(LINKS.kronox,t('tKronox'),t('tKronoxD'))}${ext(LINKS.canvas,t('tCanvas'),t('tCanvasD'))}${ext(LINKS.it,t('tPortal'),t('tPortalD'))}
+    ${ext(LINKS.adm[lang],t('tAdm'),t('tAdmD'))}${ext(LINKS.ladok,t('tLadok'),t('tLadokD'))}${ext(LINKS.kronox,t('tKronox'),t('tKronoxD'))}${ext(LINKS.canvas,t('tCanvas'),t('tCanvasD'))}${ext(LINKS.it,t('tPortal'),t('tPortalD'))}
     ${ext(LINKS.canvasApp,t('tCanvasApp'),t('tCanvasAppD'))}${ext(LINKS.lib,t('tLib'),t('tLibD'))}${ext(LINKS.student,t('tStudent'),t('tStudentD'))}</div></div>
+  ${det(t('cardT'),ul(T[lang].card)+`<div class="list">${ext(LINKS.cardOrder,t('cardOrder'),'portal.mdu.se')}${ext(LINKS.cardInfo[lang],t('cardInfo'),'')}${phoneRow(t('tStudCentre'),PHONES.studc)}${mailRow(t('tStudCentre'),'studenttorget@mdu.se')}</div>`)}
   <div class="card"><div class="eyebrow">${t('helpT')}</div><div class="list">
     ${phoneRow(t('tHelpdesk'),PHONES.helpdesk)}${mailRow(t('tHelpdesk'),'helpdesk@mdu.se')}
     ${phoneRow(t('tStudCentre')+' · '+t('tStudCentreD'),PHONES.studc)}${mailRow(t('tStudCentre'),'studenttorget@mdu.se')}
@@ -511,7 +516,7 @@ function renderNext(){
     rest.forEach((e,i)=>{
       const L=parseLoc(e.location),r=L.rooms[0];
       const tag=e.deadline?`<span class="tag dl">${t('deadline')}</span>`:L.type==='online'?`<span class="tag">${esc(L.label)}</span>`:r?(r.unknown?`<span class="tag">${roomCode(r)}</span>`:`<span class="tag go">${roomCode(r)}</span>`):'';
-      h+=`<button class="item" type="button" data-ev="${i}"><span class="date"><b>${fmtTime(e.start)}</b>${fmtDay(e.start)}</span><span>${dot(e.color)}<span class="t">${esc(e.moment||e.course)}</span><br><span class="s">${esc(e.moment?e.course:'')}</span></span>${tag}</button>`;
+      h+=`<button class="item" type="button" data-ev="${i}"><span class="date"><b>${fmtTime(e.start)}</b>${e.deadline?"":`<span class="until">–${fmtTime(e.end)}</span>`}${fmtDay(e.start)}</span><span>${dot(e.color)}<span class="t">${esc(e.moment||e.course)}</span><br><span class="s">${esc(e.moment?e.course:'')}</span></span>${tag}</button>`;
     });
     h+=`</div>`;
   }
@@ -615,15 +620,21 @@ function fitBox(x0,y0,x1,y1,pad=20){
 }
 function fitAll(){const f=DATA[floor];fitBox(0,0,f.w,f.h,4);}
 function el(n,a={},p){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);p&&p.appendChild(e);return e;}
+/* Each floor on the route gets a colour; the floor tab and the step numbers use the same colour,
+   so it is clear which floor tab belongs to which steps. Start floor = green, destination floor = orange. */
+const MID_COLS=['#2563eb','#7c3aed','#0891b2'];
+function routeFloors(){return route&&!route.same?[...new Set(route.segs.map(s=>s.fk))]:[];}
+function floorColor(fk){const L=routeFloors(),i=L.indexOf(fk);if(i<0)return null;if(i===0)return '#1f8a5b';if(i===L.length-1)return '#ff4900';return MID_COLS[(i-1)%MID_COLS.length];}
 function renderMapBar(){
   const cs=document.getElementById('campSeg'),bs=document.getElementById('bldSeg'),fs=document.getElementById('floorSeg');
   cs.innerHTML=['vas','esk'].map(c=>`<button type="button" data-c="${c}" aria-pressed="${c===campus}">${t(c)}</button>`).join('');
-  bs.innerHTML=CAMPUS[campus].blds.map(k=>`<button type="button" data-b="${k}" aria-pressed="${k===bld}">${bShort(k)}</button>`).join('');
-  const rf=route?new Set(route.segs.map(s=>s.fk)):new Set();
-  fs.innerHTML=BUILD[bld].floors.map(fk=>`<button type="button" data-f="${fk}" aria-pressed="${fk===floor}" class="${rf.has(fk)?'has-route':''}">${fk.slice(1)}</button>`).join('');
+  const rfl=routeFloors();
+  bs.innerHTML=CAMPUS[campus].blds.map(k=>{const f=rfl.find(fk=>BUILD[k].floors.includes(fk));return `<button type="button" data-b="${k}" aria-pressed="${k===bld}" ${f?`class="has-route" style="--fc:${floorColor(f)}"`:''}>${bShort(k)}</button>`;}).join('');
+  fs.innerHTML=`<span class="seglbl">${t('floor')}</span>`+BUILD[bld].floors.map(fk=>{const c=floorColor(fk);return `<button type="button" data-f="${fk}" aria-pressed="${fk===floor}" ${c?`class="has-route" style="--fc:${c}"`:''}>${fk.slice(1)}</button>`;}).join('');
   cs.querySelectorAll('button').forEach(b=>b.onclick=()=>{setCampus(b.dataset.c);renderMap();renderSheet();fitAll();});
   bs.querySelectorAll('button').forEach(b=>b.onclick=()=>{bld=b.dataset.b;floor=BUILD[bld].floors[target&&target.b===bld?target.floor-1:0];renderMap();fitAll();});
-  fs.querySelectorAll('button').forEach(b=>b.onclick=()=>{floor=b.dataset.f;renderMap();});
+  fs.querySelectorAll('button').forEach(b=>b.onclick=()=>{floor=b.dataset.f;renderMap();renderSheet();});
+  document.querySelector('.mapwrap').style.setProperty('--bar-h',document.querySelector('.mapbar').offsetHeight+'px');
 }
 function renderMap(){
   renderMapBar();
@@ -699,9 +710,14 @@ function onTap(p){
 }
 
 /* ---------- route ---------- */
-function setStart(s){start=s;store.set('mdu.start2',s);computeRoute();renderMap();renderSheet();if(route&&!route.same)fitRoute();}
-function goRoom(r){if(!r)return;target=r;if(r.campus!==campus){campus=r.campus;store.set('mdu.campus',campus);}bld=r.b;floor=r.fk;computeRoute();setView('map');requestAnimationFrame(()=>{renderSheet();route&&!route.same?fitRoute():focusTarget();});}
-function selectTarget(r){target=r;computeRoute();renderMap();renderSheet();if(route&&!route.same)fitRoute();}
+/* Show a fresh route from its first step: the map opens on the floor where you start (step 1). */
+function showRoute(){
+  if(route&&!route.same&&route.segs.length){const s0=route.segs[0];floor=s0.fk;bld=s0.fk[0];curStep=0;renderMap();renderSheet();fitRoute();}
+  else{renderMap();renderSheet();if(target)focusTarget();}
+}
+function setStart(s){start=s;store.set('mdu.start2',s);computeRoute();showRoute();}
+function goRoom(r){if(!r)return;target=r;if(r.campus!==campus){campus=r.campus;store.set('mdu.campus',campus);}bld=r.b;floor=r.fk;sheetMin=false;computeRoute();if(route&&!route.same&&route.segs.length){floor=route.segs[0].fk;bld=floor[0];}setView('map');requestAnimationFrame(showRoute);}
+function selectTarget(r){target=r;sheetMin=false;computeRoute();showRoute();}
 function focusTarget(){const f=DATA[floor];const k=0.35;fitBox(target.x-f.w*k/2,target.y-f.h*k/2,target.x+f.w*k/2,target.y+f.h*k/2,0);}
 function computeRoute(){
   route=null;curStep=-1;
@@ -755,24 +771,47 @@ function renderSheet(){
     sh.querySelector('#cx').onclick=()=>{tapMode=null;renderSheet();};setSheetH();return;}
   if(!target){sh.innerHTML=`<div class="grab"></div><p class="muted small" style="margin:4px 0">${t('tapHint')}</p><p class="note" style="margin:0">${t('dataNote')}</p>`;setSheetH();return;}
   const kind=kindName(target);
-  let h=`<div class="grab"></div><div class="row wrap"><span class="dot" style="background:var(--target)"></span><h2 class="${target.kind?'':'code'}" style="flex:1">${esc(dn(target))}</h2><span class="muted small">${kind&&target.kind!=='wc'?esc(kind)+' · ':''}${placeLabel(target)}</span></div>`;
+  const canMin=canRoute(target)&&route&&!route.same;
+  let h=`${canMin?`<button class="grab" type="button" id="grab" aria-label="${sheetMin?t('showStepsA'):t('hideStepsA')}"></button>`:'<div class="grab"></div>'}<div class="row wrap head"><span class="dot" style="background:var(--target)"></span><h2 class="${target.kind?'':'code'}" style="flex:1">${esc(dn(target))}</h2><span class="muted small">${kind&&target.kind!=='wc'?esc(kind)+' · ':''}${placeLabel(target)}</span></div>`;
   if(!canRoute(target)){h+=`<p class="small" style="margin:10px 0 0">${t('noRoute',{p:placeLabel(target)})}</p>`;}
   else{
     h+=`<button class="from" type="button" id="fromBtn"><span class="dot" style="background:var(--start)"></span><span style="flex:1"><span class="muted small">${t('from')}: </span>${startLabel()}</span><span class="small" style="color:var(--accent);font-weight:600">${t('change')}</span></button>`;
     if(route&&route.same) h+=`<p class="small">${t('sameSpot')}</p>`;
     else if(route){
-      h+=`<ol class="steps">${route.steps.map((s,i)=>`<li class="${i===curStep?'cur':''}"><button type="button" data-step="${i}"><span class="n">${i+1}</span><span class="small">${s.html}</span></button></li>`).join('')}</ol>
+      h+=`<button class="minbar" type="button" id="minbar">▲ ${t('showSteps',{n:route.steps.length})}</button>`;
+      h+=`<ol class="steps">${route.steps.map((s,i)=>`<li class="${i===curStep?'cur':''} ${s.fk!==floor?'other':''}"><button type="button" data-step="${i}"><span class="n" style="--fc:${floorColor(s.fk)||'var(--ink)'}">${i+1}</span><span class="small">${s.html}</span></button></li>`).join('')}</ol>
       <div class="row wrap" style="margin-top:8px"><span class="pill">${t('minsWalk',{n:route.mins})}</span>${target.campus==='vas'?`<label class="chk"><input type="checkbox" id="indoor" ${AVOID_OUT?'checked':''}> ${t('indoorOnly')}</label>`:''}</div>`;
     }
     h+=`<div class="starthint"><button class="ghost" type="button" id="setHere">📍 ${t('setStart')}</button><span class="small muted">${t('setStartHint')}</span></div>`;
   }
-  sh.innerHTML=h;setSheetH();
+  sh.innerHTML=h;sh.classList.toggle('min',!!(sheetMin&&canMin));setSheetH();wireSheet(sh,canMin);
   const fb=sh.querySelector('#fromBtn');fb&&(fb.onclick=openStartPicker);
-  const ind=sh.querySelector('#indoor');ind&&(ind.onchange=()=>{AVOID_OUT=ind.checked;store.set('mdu.indoor',AVOID_OUT);computeRoute();renderMap();renderSheet();if(route&&!route.same)fitRoute();});
+  const ind=sh.querySelector('#indoor');ind&&(ind.onchange=()=>{AVOID_OUT=ind.checked;store.set('mdu.indoor',AVOID_OUT);computeRoute();showRoute();});
   const sh2=sh.querySelector('#setHere');sh2&&(sh2.onclick=()=>{const r=target;target=null;route=null;setStart({type:'room',key:r.key});toast(t('startSet',{r:dn(r)}));});
   sh.querySelectorAll('[data-step]').forEach(b=>b.onclick=()=>{curStep=+b.dataset.step;const s=route.steps[curStep];floor=s.fk;bld=s.fk[0];renderMap();renderSheet();fitRoute();});
 }
-function setSheetH(){const sh=document.getElementById('sheet');document.querySelector('.mapwrap').style.setProperty('--sheet-h',sh.offsetHeight+'px');}
+/* Bottom sheet: drag the handle down (or tap it) to shrink it to one line and see the whole map; drag up or tap "Show steps" to open it again. */
+var sheetMin=false;
+function setSheetMin(v){if(sheetMin===v)return;sheetMin=v;renderSheet();requestAnimationFrame(()=>{if(route&&!route.same)fitRoute();else if(target)focusTarget();});}
+function wireSheet(sh,canMin){
+  if(!canMin)return;
+  const g=sh.querySelector('#grab'),mb=sh.querySelector('#minbar');
+  g.onclick=()=>setSheetMin(!sheetMin);mb&&(mb.onclick=()=>setSheetMin(false));
+  let y0=null,moved=false;
+  const down=e=>{y0=e.clientY;moved=false;};
+  const move=e=>{if(y0===null)return;const dy=e.clientY-y0;if(Math.abs(dy)>6)moved=true;if(moved&&!sheetMin&&dy>0)sh.style.transform=`translateY(${Math.min(dy,sh.offsetHeight-60)}px)`;};
+  const up=e=>{if(y0===null)return;const dy=e.clientY-y0;y0=null;sh.style.transform='';
+    if(!moved)return;if(dy>40)setSheetMin(true);else if(dy<-30)setSheetMin(false);};
+  for(const el of [g,sh.querySelector('.head'),mb].filter(Boolean)){
+    el.addEventListener('pointerdown',down);
+  }
+  if(!sh._wired){sh._wired=true;
+    window.addEventListener('pointermove',e=>sh._mv&&sh._mv(e));window.addEventListener('pointerup',e=>sh._up&&sh._up(e));window.addEventListener('pointercancel',e=>sh._up&&sh._up(e));}
+  sh._mv=move;sh._up=up;
+  // a click right after a drag should not toggle again
+  g.addEventListener('click',e=>{if(moved){e.stopImmediatePropagation();moved=false;}},true);
+}
+function setSheetH(){const sh=document.getElementById('sheet'),w=document.querySelector('.mapwrap');w.style.setProperty('--sheet-h',sh.offsetHeight+'px');w.style.setProperty('--bar-h',document.querySelector('.mapbar').offsetHeight+'px');}
 
 /* start picker */
 function openStartPicker(){
@@ -800,10 +839,15 @@ let toastT;function toast(m){const e=document.getElementById('toast');e.textCont
 function applyLang(){
   document.documentElement.lang=lang;
   document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t(e.dataset.t));
-  document.getElementById('langBtn').textContent=t('otherLang');
+  document.getElementById('langBtn').textContent=t('otherLang');if(typeof paintThemeBtn==='function')paintThemeBtn();
   if(target)computeRoute();
   renderNext();renderPlaces();renderSearch();renderBus();renderInfo();if(typeof renderA2HS==='function')renderA2HS();if(view==='map'){renderMap();renderSheet();}
 }
+/* Light / dark mode: follows the phone by default; the moon/sun button switches and remembers it */
+function effTheme(){const d=document.documentElement.dataset.theme;return d||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');}
+function paintThemeBtn(){const b=document.getElementById('themeBtn');if(!b)return;const dark=effTheme()==='dark';b.textContent=dark?'☀':'☾';b.setAttribute('aria-label',dark?t('lightMode'):t('darkMode'));b.title=b.getAttribute('aria-label');}
+document.getElementById('themeBtn').onclick=()=>{const next=effTheme()==='dark'?'light':'dark';document.documentElement.dataset.theme=next;store.set('mdu.theme',next);paintThemeBtn();};
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',paintThemeBtn);}catch(e){}
 document.getElementById('langBtn').onclick=()=>{lang=lang==='en'?'sv':'en';store.set('mdu.lang',lang);applyLang();};
 /* optional university logo: shown only if www/img/university-logo.png exists (add it only with MDU's permission) */
 (()=>{const img=new Image();img.onload=()=>{const m=document.getElementById('mark');m.innerHTML='';m.classList.add('logo');img.alt='';m.appendChild(img);};img.src='img/university-logo.png';})();

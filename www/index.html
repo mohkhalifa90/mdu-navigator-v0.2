@@ -13,12 +13,14 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="stylesheet" href="css/app.css">
+<script>try{var th=JSON.parse(localStorage.getItem("mdu.theme"));if(th==="dark"||th==="light")document.documentElement.dataset.theme=th;}catch(e){}</script>
 </head>
 <body>
 <div id="app">
   <header>
     <div class="mark" id="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.2 7 12 7 12s7-6.8 7-12a7 7 0 0 0-7-7zm0 9.6a2.6 2.6 0 1 1 0-5.2 2.6 2.6 0 0 1 0 5.2z"/></svg></div>
     <h1><span data-t="appTitle"></span><small data-t="appSub"></small></h1>
+    <button class="ghost themebtn" id="themeBtn" type="button" aria-label="Dark mode"></button>
     <button class="ghost" id="langBtn" type="button">Svenska</button>
   </header>
   <main>

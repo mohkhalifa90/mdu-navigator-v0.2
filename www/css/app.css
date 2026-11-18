@@ -87,10 +87,12 @@ nav button[aria-selected="true"]{color:var(--accent);font-weight:600}
 .seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:3px;box-shadow:0 2px 8px rgba(0,0,0,.08);pointer-events:auto}
 .seg button{border:0;background:none;border-radius:9px;padding:5px 11px;font-size:13px;font-weight:600;color:var(--muted)}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
-.seg button.has-route{box-shadow:inset 0 -3px 0 var(--target)}
-.zoom{position:absolute;inset-inline-start:10px;bottom:calc(var(--sheet-h,120px) + 12px);display:flex;flex-direction:column;gap:6px}
+.seg button.has-route{box-shadow:inset 0 -4px 0 var(--fc,var(--target));color:var(--fc,var(--target));font-weight:700}
+.mapbar .seg button.has-route[aria-pressed="true"]{background:var(--fc,var(--target));color:#fff;box-shadow:none}
+.seglbl{align-self:center;padding:0 4px 0 8px;font-size:12px;color:var(--muted);font-weight:600}
+.zoom{position:absolute;inset-inline-start:10px;top:calc(var(--bar-h,96px) + 22px);display:flex;flex-direction:column;gap:6px}
 .zoom button{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:20px;line-height:1;box-shadow:0 2px 8px rgba(0,0,0,.08)}
-.sheet{position:absolute;inset-inline:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);border-radius:18px 18px 0 0;box-shadow:0 -6px 24px rgba(0,0,0,.12);padding:10px 16px 14px;max-height:62%;overflow-y:auto}
+.sheet{position:absolute;inset-inline:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);border-radius:18px 18px 0 0;box-shadow:0 -6px 24px rgba(0,0,0,.12);padding:10px 16px 14px;max-height:55%;overflow-y:auto;transition:transform .15s ease-out;touch-action:pan-y}
 .grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 8px}
 .sheet h2{margin:0;font-size:22px}
 .from{display:flex;align-items:center;gap:10px;margin-top:10px;padding:9px 12px;border-radius:12px;background:var(--bg);border:1px solid var(--line);width:100%;text-align:start}
@@ -134,7 +136,7 @@ nav button[aria-selected="true"]{color:var(--accent);font-weight:600}
 .deps{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px}
 .dep{display:flex;flex-direction:column;align-items:center;padding:7px 4px;border-radius:10px;border:1px solid var(--line)}
 .dep.past{opacity:.4}.dep.nx{border-color:var(--brand);background:var(--accent-soft)}
-.mapbar .seg button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.mapbar .seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
 a.btn{text-decoration:none}
 
 nav button{font-size:11px}
@@ -169,3 +171,19 @@ a.item.link{text-decoration:none;color:inherit;grid-template-columns:22px 1fr au
 .a2hs-b{display:flex;gap:8px;margin-top:8px}
 .a2hs-b .btn{flex:1;margin:0}
 .a2hs-b .btn.ghost{background:none;color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:11px 16px;font-size:inherit}
+
+/* route colours per floor: step numbers match their floor tab */
+.steps .n{background:var(--fc,var(--bg));color:#fff;border-color:transparent}
+.steps li.other{opacity:.55}
+.steps li.other.cur{opacity:1}
+/* collapsible bottom sheet */
+button.grab{display:block;border:0;padding:0;width:56px;height:6px;margin:0 auto 10px;cursor:grab;position:relative;touch-action:none}
+button.grab::after{content:"";position:absolute;inset:-14px -30px}
+.sheet .head{touch-action:none}
+.minbar{display:none;width:100%;margin-top:8px;padding:9px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-weight:600;font-size:14px}
+.sheet.min{padding-bottom:10px}
+.sheet.min > :not(.grab):not(.head):not(.minbar){display:none}
+.sheet.min .minbar{display:block}
+/* theme button */
+.themebtn{width:40px;height:40px;padding:0;display:grid;place-items:center;font-size:18px;flex:0 0 auto}
+.item .date .until{display:block;font-size:12px;color:var(--ink);font-weight:500;margin:-2px 0 2px}
