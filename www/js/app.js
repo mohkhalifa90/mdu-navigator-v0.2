@@ -1,8 +1,8 @@
 /* ---------- i18n: English and Swedish ---------- */
 const T = {
- en:{appTitle:'MDU Navigator',appSub:'Campus Västerås · Eskilstuna',tNext:'Schedule',tSearch:'Search',tMap:'Map',tPlaces:'Places',tBus:'Bus',
+ en:{appTitle:'MDU Navigator',appSub:'Västerås · Eskilstuna',tNext:'Schedule',tSearch:'Search',tMap:'Map',tPlaces:'Places',tBus:'Bus',
   vas:'Västerås',esk:'Eskilstuna',
-  next:'Next session',now:'Happening now',later:'Coming up',goTo:'Take me to',online:'Online',deadline:'Deadline',nextDeadline:'Next deadline',
+  next:'Next session',now:'Happening now',later:'Coming up',laterSame:'Later the same day',goTo:'Take me to',online:'Online',deadline:'Deadline',nextDeadline:'Next deadline',
   notMapped:'This room isn’t on the map yet',example:'Example',yours:'Your schedule',
   myCourses:'My courses',addCourse:'Add a course',addHint:'Add each course you take. You can add as many as you like.',
   linkPh:'Paste a KronoX schedule link',addLink:'Add link',orFile:'or',uploadB:'Upload .ics files from KronoX',
@@ -45,9 +45,9 @@ const T = {
   busForNone:'Coming from {from}? No MDU bus that day gets you to {c} in time.',
   termOff:'Outside the semester',holiday:'Public holiday',weekend:'Weekend'
  },
- sv:{appTitle:'MDU Navigator',appSub:'Campus Västerås · Eskilstuna',tNext:'Schema',tSearch:'Sök',tMap:'Karta',tPlaces:'Platser',tBus:'Buss',
+ sv:{appTitle:'MDU Navigator',appSub:'Västerås · Eskilstuna',tNext:'Schema',tSearch:'Sök',tMap:'Karta',tPlaces:'Platser',tBus:'Buss',
   vas:'Västerås',esk:'Eskilstuna',
-  next:'Nästa pass',now:'Pågår nu',later:'Kommande',goTo:'Visa vägen till',online:'Online',deadline:'Inlämning',nextDeadline:'Nästa inlämning',
+  next:'Nästa pass',now:'Pågår nu',later:'Kommande',laterSame:'Senare samma dag',goTo:'Visa vägen till',online:'Online',deadline:'Inlämning',nextDeadline:'Nästa inlämning',
   notMapped:'Salen finns inte på kartan än',example:'Exempel',yours:'Ditt schema',
   myCourses:'Mina kurser',addCourse:'Lägg till en kurs',addHint:'Lägg till varje kurs du läser. Du kan lägga till hur många du vill.',
   linkPh:'Klistra in en schemalänk från KronoX',addLink:'Lägg till länk',orFile:'eller',uploadB:'Ladda upp .ics-filer från KronoX',
@@ -502,15 +502,25 @@ function renderNext(){
   let h=`<div class="row"><span class="pill ${SCHEDS.length?'':'warn'}">${t(SCHEDS.length?'yours':'example')}</span><span style="flex:1"></span>${SCHEDS.some(s=>s.source==='link')?`<button class="ghost" id="refAll" type="button">${t('refreshAll')}</button>`:''}</div>`;
   if(!sessions.length){h+=`<div class="card muted">${t('noMore')}</div>`;}
   else{
-    const e=sessions[0],live=e.start<=now,c=eventCampus(e);
-    h+=`<article class="card next" style="border-top:4px solid ${COLORS[e.color%COLORS.length]}"><div class="row"><span class="eyebrow" style="flex:1">${live?t('now'):t('next')}</span>${live?`<span class="pill live">${t('endsIn')} ${fmtRel(e.end)}</span>`:`<span class="rel">${t('inX')} ${fmtRel(e.start)}</span>`}</div>
-      <h2>${esc(e.moment||e.course)}</h2><div class="muted small">${esc(e.moment?e.course:'')}${c?` · ${t(c)}`:''}</div>
+    /* Every remaining session on the same day as the next one gets its own card at the top,
+       each in its course colour; sessions in a room get the "Take me to" button, online ones don't. */
+    const dayKey=x=>new Date(x).toDateString(), d0=dayKey(sessions[0].start);
+    var featured=sessions.filter(x=>dayKey(x.start)===d0||x.start<=now);
+    let shownFuture=false;
+    featured.forEach((e,i)=>{
+      const live=e.start<=now,c=eventCampus(e);
+      const label=live?t('now'):(!shownFuture?t('next'):t('laterSame'));
+      if(!live)shownFuture=true;
+      h+=`<article class="card next" style="border-top:4px solid ${COLORS[e.color%COLORS.length]}"><div class="row"><span class="eyebrow" style="flex:1">${label}</span>${live?`<span class="pill live">${t('endsIn')} ${fmtRel(e.end)}</span>`:`<span class="rel">${t('inX')} ${fmtRel(e.start)}</span>`}</div>
+      <h2>${dot(e.color)}${esc(e.moment||e.course)}</h2><div class="muted small">${esc(e.moment?e.course:'')}${c?` · ${t(c)}`:''}</div>
       <div class="when" style="margin-top:8px">${fmtDay(e.start)} · <span class="code" style="font-weight:500">${fmtTime(e.start)}–${fmtTime(e.end)}</span></div>
       <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px">${locBlock(e)}</div>
-      ${busHint(e)}</article>`;
+      ${i===0?busHint(e):''}</article>`;
+    });
   }
   if(nextDl) h+=`<div class="card deadline row">${dot(nextDl.color)}<span style="flex:1"><span class="eyebrow">${t('nextDeadline')}</span><br><b>${esc(nextDl.moment||nextDl.course)}</b><br><span class="muted small">${esc(nextDl.course)}</span></span><span class="small" style="text-align:end"><b>${fmtDay(nextDl.start)}</b><br><span class="code">${fmtTime(nextDl.start)}</span></span></div>`;
-  const rest=evs.filter(e=>e!==sessions[0]&&e!==nextDl).slice(0,10);
+  const feat=new Set(typeof featured!=='undefined'?featured:[]);
+  const rest=evs.filter(e=>!feat.has(e)&&e!==nextDl).slice(0,10);
   if(rest.length){
     h+=`<div class="eyebrow">${t('later')}</div><div class="card list" style="padding:2px 12px">`;
     rest.forEach((e,i)=>{

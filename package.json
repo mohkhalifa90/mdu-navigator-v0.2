@@ -1,6 +1,6 @@
 {
   "name": "mdu-navigator",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Unofficial student prototype: rooms, routes, schedules and the MDU bus for Campus V\u00e4ster\u00e5s and Eskilstuna (Android, iOS, web).",
   "scripts": {
     "sync": "cap sync",
