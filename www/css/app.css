@@ -155,7 +155,7 @@ details.fold[open] summary::after{content:'−'}
 details.fold summary::-webkit-details-marker{display:none}
 .foldbody{padding:0 14px 14px;display:flex;flex-direction:column;gap:8px}
 ul.tight{margin:0;padding-inline-start:18px;display:flex;flex-direction:column;gap:6px;font-size:14px}
-a.item.link{text-decoration:none;color:inherit;grid-template-columns:38px 1fr 22px;-webkit-tap-highlight-color:transparent}
+a.item.link{text-decoration:none;color:inherit;grid-template-columns:38px 1fr auto;-webkit-tap-highlight-color:transparent}
 a.item.link:active{background:var(--bg)}
 .ico{color:var(--accent);font-weight:700;text-align:center}
 .mark.logo{background:#fff;border-radius:8px;padding:2px 4px;height:40px;width:auto}
@@ -208,11 +208,23 @@ button.grab::after{content:"";position:absolute;inset:-14px -30px}
 .prog span{display:block;height:100%;border-radius:99px}
 .progl{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums}
 /* start point pulse on the map */
-@keyframes spulse{0%{r:8;opacity:.45}100%{r:20;opacity:0}}
+@keyframes spulse{0%{r:5;opacity:.45}100%{r:12;opacity:0}}
 .spulse{animation:spulse 1.8s ease-out infinite}
 @media (prefers-reduced-motion:reduce){.spulse,.pulse2{animation:none}}
-@keyframes tpulse{0%{opacity:.5;transform:scale(1)}100%{opacity:0;transform:scale(1.3)}}
+@keyframes tpulse{0%{opacity:.6;transform:scale(1)}100%{opacity:0;transform:scale(3)}}
 .tpulse{transform-box:fill-box;transform-origin:center}
 .tpulse{animation:tpulse 1.6s ease-out infinite}
 @media (prefers-reduced-motion:reduce){.tpulse{animation:none}}
 .routebase{mix-blend-mode:multiply}
+
+/* call / email action pill on phone and mail rows */
+.lact{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border-radius:99px;font-size:13px;font-weight:700;white-space:nowrap}
+.lact.phone{background:rgba(31,138,91,.13);color:#1a7a50}
+.lact.mail{background:rgba(37,99,235,.12);color:#1d4ed8}
+:root[data-theme="dark"] .lact.phone{background:rgba(52,199,123,.16);color:#5fd49a}
+:root[data-theme="dark"] .lact.mail{background:rgba(96,140,255,.16);color:#8fb0ff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .lact.phone{background:rgba(52,199,123,.16);color:#5fd49a}:root:not([data-theme="light"]) .lact.mail{background:rgba(96,140,255,.16);color:#8fb0ff}}
+/* destination label blinks so the map under it shows through */
+@keyframes tblink{0%,45%{opacity:1}55%,88%{opacity:0}100%{opacity:1}}
+.tlabel{animation:tblink 3.2s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.tlabel{animation:none;opacity:.85}}

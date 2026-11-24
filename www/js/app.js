@@ -449,7 +449,7 @@ const TILE={
   food:{bg:'#8d6e63',fg:'#fff',ic:'food'},
   link:{bg:"var(--bg)",fg:"var(--ink)",ic:"link",line:true}};
 const tileHtml=k=>{const s=TILE[k]||TILE.link;return `<span class="ltile${s.line?' line':''}" style="background:${s.bg};color:${s.fg}" aria-hidden="true">${s.ic?svgi(s.ic):s.ch}</span>`;};
-const ext=(href,title,desc,tile='link')=>{const web=/^https?:/.test(href);return `<a class="item link" href="${href}" ${web?'target="_blank" rel="noopener"':''}>${tileHtml(tile)}<span><span class="t">${esc(title)}</span>${desc?`<br><span class="s">${esc(desc)}</span>`:''}</span>${web?`<span class="lext" title="${esc(t('web'))}">${svgi('ext',18)}</span>`:'<span></span>'}</a>`;};
+const ext=(href,title,desc,tile='link')=>{const web=/^https?:/.test(href);return `<a class="item link" href="${href}" ${web?'target="_blank" rel="noopener"':''}>${tileHtml(tile)}<span><span class="t">${esc(title)}</span>${desc?`<br><span class="s">${esc(desc)}</span>`:''}</span>${web?`<span class="lext" title="${esc(t('web'))}">${svgi('ext',18)}</span>`:`<span class="lact ${tile}">${svgi(tile,15)}${esc(tile==='phone'?t('call'):t('email'))}</span>`}</a>`;};
 const phoneRow=(label,n)=>ext(tel(n),label,n,'phone');
 const mailRow=(label,m)=>ext('mailto:'+m,label,m,'mail');
 function mapBtn(code){const r=BYCODE.get(norm(code));return r?`<button class="ghost small" type="button" data-room="${esc(r.key)}">${t('showMap')}: <span class="code">${esc(code)}</span></button>`:'';}
@@ -695,20 +695,24 @@ function renderMap(){
   const sp=startPoint();
   if(target&&sp&&sp.fk===floor){
     // start point: a soft green pulse around the dot so it is easy to spot
-    el('circle',{cx:sp.x,cy:sp.y,r:9,fill:'var(--start)',opacity:.35,class:'spulse'},svg);
-    el('circle',{cx:sp.x,cy:sp.y,r:8,fill:'var(--start)',stroke:'#fff',"stroke-width":3},svg);
+    el('circle',{cx:sp.x,cy:sp.y,r:5.5,fill:'var(--start)',opacity:.35,class:'spulse'},svg);
+    el('circle',{cx:sp.x,cy:sp.y,r:5,fill:'var(--start)',stroke:'#fff',"stroke-width":2},svg);
   }
   if(target&&target.fk===floor){
     // destination: the room number is redrawn in a clear label on top of the map (so nothing hides it),
     // with an orange pin standing just above the label
-    const code=String(target.id||target.name||""), fs=8.5, w=code.length*fs*0.62+10, hgt=fs+6;
+    const code=String(target.id||target.name||""), fs=7, w=code.length*fs*0.62+8, hgt=fs+5;
     const g=el('g',{transform:`translate(${target.x} ${target.y})`},svg);
-    el('ellipse',{cx:0,cy:0,rx:w/2+4,ry:hgt/2+3,fill:'var(--target)',opacity:.3,class:'tpulse'},g);
-    el('rect',{x:-w/2,y:-hgt/2,width:w,height:hgt,rx:hgt/2,fill:'#fff',stroke:'var(--target)',"stroke-width":1.8},g);
-    const tx=el('text',{x:0,y:0.5,"text-anchor":'middle',"dominant-baseline":'middle',"font-size":fs,"font-weight":800,fill:'#141414',"font-family":'ui-monospace,Menlo,Consolas,monospace'},g);tx.textContent=code;
-    const pg=el('g',{transform:`translate(0 ${-hgt/2-1}) scale(.68)`,opacity:.88},g);
-    el('path',{d:'M0 0C-3.5-7-11-12.5-11-21A11 11 0 1 1 11-21C11-12.5 3.5-7 0 0Z',fill:'var(--target)',stroke:'#fff',"stroke-width":2.5,"stroke-linejoin":'round'},pg);
-    el('circle',{cx:0,cy:-21,r:4.5,fill:'#fff'},pg);
+    // the label blinks (shows, fades away, comes back) so whatever is drawn under it on the map can be seen too
+    const lb=el('g',{class:'tlabel'},g);
+    el('rect',{x:-w/2,y:-hgt/2,width:w,height:hgt,rx:hgt/2,fill:'#fff',stroke:'var(--target)',"stroke-width":1.4},lb);
+    const tx=el('text',{x:0,y:0.5,"text-anchor":'middle',"dominant-baseline":'middle',"font-size":fs,"font-weight":800,fill:'#141414',"font-family":'ui-monospace,Menlo,Consolas,monospace'},lb);tx.textContent=code;
+    // small pin standing just above the spot, with a soft pulse at its tip
+    const pg=el('g',{transform:`translate(0 ${-hgt/2-1})`},g);
+    el('circle',{cx:0,cy:0,r:3,fill:'var(--target)',opacity:.5,class:'tpulse'},pg);
+    const pin=el('g',{transform:'scale(.6)',opacity:.9},pg);
+    el('path',{d:'M0 0C-3.5-7-11-12.5-11-21A11 11 0 1 1 11-21C11-12.5 3.5-7 0 0Z',fill:'var(--target)',stroke:'#fff',"stroke-width":2.5,"stroke-linejoin":'round'},pin);
+    el('circle',{cx:0,cy:-21,r:4.5,fill:'#fff'},pin);
   }
   applyVB();
 }
