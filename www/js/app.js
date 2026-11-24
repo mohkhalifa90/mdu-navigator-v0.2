@@ -2,7 +2,7 @@
 const T = {
  en:{appTitle:'MDU Navigator',appSub:'Västerås · Eskilstuna',tNext:'Schedule',tSearch:'Search',tMap:'Map',tPlaces:'Places',tBus:'Bus',
   vas:'Västerås',esk:'Eskilstuna',
-  next:'Next session',now:'Happening now',later:'Coming up',progress:'How much of the session has passed',progDone:'{p}% done',laterSame:'Later the same day',goTo:'Take me to',online:'Online',deadline:'Deadline',nextDeadline:'Next deadline',
+  next:'Next session',now:'Happening now',later:'Coming up',roomTba:'Room TBA',roomTbaLong:'No room booked yet in KronoX',progress:'How much of the session has passed',progDone:'{p}% done',laterSame:'Later the same day',goTo:'Take me to',online:'Online',deadline:'Deadline',nextDeadline:'Next deadline',
   notMapped:'This room isn’t on the map yet',example:'Example',yours:'Your schedule',
   myCourses:'My courses',addCourse:'Add a course',addHint:'Add each course you take. You can add as many as you like.',
   linkPh:'Paste a KronoX schedule link',addLink:'Add link',orFile:'or',uploadB:'Upload .ics files from KronoX',
@@ -47,7 +47,7 @@ const T = {
  },
  sv:{appTitle:'MDU Navigator',appSub:'Västerås · Eskilstuna',tNext:'Schema',tSearch:'Sök',tMap:'Karta',tPlaces:'Platser',tBus:'Buss',
   vas:'Västerås',esk:'Eskilstuna',
-  next:'Nästa pass',now:'Pågår nu',later:'Kommande',progress:'Hur mycket av passet som har gått',progDone:'{p} % klart',laterSame:'Senare samma dag',goTo:'Visa vägen till',online:'Online',deadline:'Inlämning',nextDeadline:'Nästa inlämning',
+  next:'Nästa pass',now:'Pågår nu',later:'Kommande',roomTba:'Sal ej klar',roomTbaLong:'Ingen sal bokad i KronoX än',progress:'Hur mycket av passet som har gått',progDone:'{p} % klart',laterSame:'Senare samma dag',goTo:'Visa vägen till',online:'Online',deadline:'Inlämning',nextDeadline:'Nästa inlämning',
   notMapped:'Salen finns inte på kartan än',example:'Exempel',yours:'Ditt schema',
   myCourses:'Mina kurser',addCourse:'Lägg till en kurs',addHint:'Lägg till varje kurs du läser. Du kan lägga till hur många du vill.',
   linkPh:'Klistra in en schemalänk från KronoX',addLink:'Lägg till länk',orFile:'eller',uploadB:'Ladda upp .ics-filer från KronoX',
@@ -240,6 +240,8 @@ function splitSummary(s){
 function parseLoc(loc){
   if(!loc||!loc.trim()) return {type:'none',rooms:[]};
   if(/canvas|zoom|teams|online|distans/i.test(loc)) return {type:'online',label:loc.trim(),rooms:[]};
+  // KronoX writes "Saknas - bevakas …" when no room has been booked yet
+  if(/^\s*saknas/i.test(loc)) return {type:'tba',rooms:[]};
   const rooms=[];
   for(const tok of loc.split(/[,;\/]/).map(s=>s.trim()).filter(Boolean)){
     const m=tok.match(/\b([ABCRTU]\d-\d{3})\b/i);
@@ -519,6 +521,7 @@ function locBlock(e){
   const L=parseLoc(e.location);
   if(L.type==='online') return `<div class="roomchip"><span aria-hidden="true">💻</span><span>${t('online')} · ${esc(L.label)}</span></div>`;
   if(L.type==='none') return '';
+  if(L.type==='tba') return `<div class="roomchip"><span aria-hidden="true">⏳</span><span>${t('roomTbaLong')}</span></div>`;
   return L.rooms.map(r=>r.unknown?`<div class="roomchip">${roomCode(r)}<span class="muted small">${t('notMapped')}</span></div>`:
     `<div class="row wrap"><div class="roomchip">${roomCode(r)}<span class="muted small">${placeLabel(r)}</span></div><button class="btn" type="button" data-go="${esc(r.key)}" style="flex:1;min-width:150px">${t('goTo')} <span class="code">${esc(r.id)}</span></button></div>`).join('');
 }
@@ -550,11 +553,16 @@ function renderNext(){
   const feat=new Set(typeof featured!=='undefined'?featured:[]);
   const rest=evs.filter(e=>!feat.has(e)&&e!==nextDl).slice(0,10);
   if(rest.length){
-    h+=`<div class="eyebrow">${t('later')}</div><div class="card list" style="padding:2px 12px">`;
+    /* Coming up: grouped by day; each session is a row with a course-colour bar, the time on the left,
+       and the title, course and room stacked so long KronoX text never squeezes into a narrow column */
+    h+=`<div class="eyebrow">${t('later')}</div><div class="card list evlist">`;
+    let lastDay='';
     rest.forEach((e,i)=>{
       const L=parseLoc(e.location),r=L.rooms[0];
-      const tag=e.deadline?`<span class="tag dl">${t('deadline')}</span>`:L.type==='online'?`<span class="tag">${esc(L.label)}</span>`:r?(r.unknown?`<span class="tag">${roomCode(r)}</span>`:`<span class="tag go">${roomCode(r)}</span>`):'';
-      h+=`<button class="item" type="button" data-ev="${i}"><span class="date"><b>${fmtTime(e.start)}</b>${e.deadline?"":`<span class="until">–${fmtTime(e.end)}</span>`}${fmtDay(e.start)}</span><span>${dot(e.color)}<span class="t">${esc(e.moment||e.course)}</span><br><span class="s">${esc(e.moment?e.course:'')}</span></span>${tag}</button>`;
+      const tag=e.deadline?`<span class="tag dl">${t('deadline')}</span>`:L.type==='online'?`<span class="tag">💻 ${esc(L.label)}</span>`:L.type==='tba'?`<span class="tag">⏳ ${t('roomTba')}</span>`:r?(r.unknown?`<span class="tag">${roomCode(r)}</span>`:`<span class="tag go">${roomCode(r)}</span><span class="gopill">${t('goTo')} ›</span>`):'';
+      const dk=new Date(e.start).toDateString();
+      if(dk!==lastDay){lastDay=dk;h+=`<div class="evday">${fmtDay(e.start)}</div>`;}
+      h+=`<button class="item ev" type="button" data-ev="${i}" style="--cc:${COLORS[e.color%COLORS.length]}"><span class="evtime"><b>${fmtTime(e.start)}</b>${e.deadline?'':`<span>${fmtTime(e.end)}</span>`}</span><span class="evbody"><span class="t">${esc(e.moment||e.course)}</span>${e.moment?`<span class="s">${esc(e.course)}</span>`:''}${tag?`<span class="evtag">${tag}</span>`:''}</span></button>`;
     });
     h+=`</div>`;
   }
