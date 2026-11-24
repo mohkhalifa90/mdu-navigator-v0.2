@@ -2,7 +2,7 @@
 const T = {
  en:{appTitle:'MDU Navigator',appSub:'Västerås · Eskilstuna',tNext:'Schedule',tSearch:'Search',tMap:'Map',tPlaces:'Places',tBus:'Bus',
   vas:'Västerås',esk:'Eskilstuna',
-  next:'Next session',now:'Happening now',later:'Coming up',laterSame:'Later the same day',goTo:'Take me to',online:'Online',deadline:'Deadline',nextDeadline:'Next deadline',
+  next:'Next session',now:'Happening now',later:'Coming up',progress:'How much of the session has passed',progDone:'{p}% done',laterSame:'Later the same day',goTo:'Take me to',online:'Online',deadline:'Deadline',nextDeadline:'Next deadline',
   notMapped:'This room isn’t on the map yet',example:'Example',yours:'Your schedule',
   myCourses:'My courses',addCourse:'Add a course',addHint:'Add each course you take. You can add as many as you like.',
   linkPh:'Paste a KronoX schedule link',addLink:'Add link',orFile:'or',uploadB:'Upload .ics files from KronoX',
@@ -13,7 +13,7 @@ const T = {
   qph:'Search: R2-142, A2-003, Omega, WC…',floor:'Floor',darkMode:'Dark mode',lightMode:'Light mode',showSteps:'Show the steps ({n})',showStepsA:'Show the steps',hideStepsA:'Hide the steps',route:'Route',mapOnly:'Map only',
   bR:'R Block',bU:'T/U Block',bE:'Main building',bX:'Exam hall',bRs:'R',bUs:'T/U',bEs:'A·B·C',bXs:'Exam hall',
   from:'From',change:'Change',tapHint:'Tap any room on the map, or find it in Search.',
-  startAt:'Start at',takeUp:'go up',takeDown:'go down',toFloor:'to floor',walkTo:'Walk to',redMark:'the orange ring on the map.',
+  startAt:'Start at',takeUp:'go up',takeDown:'go down',toFloor:'to floor',walkTo:'Walk to',redMark:'marked with the orange pin on the map.',
   linkStep:'Take the connecting corridor to {b}, floor {f}',
   minsWalk:'About {n} min walk (estimate)',noRoute:'No route to this place yet. It is marked on the map: {p}.',otherCampus:'This room is in {c}. Check the Bus tab for the MDU bus.',
   pickStart:'Where are you now?',entrances:'Entrances',nearRoom:'I’m next to room…',tapMap:'Pick my spot on the map',tapMapHint:'Tap the room closest to you',
@@ -47,7 +47,7 @@ const T = {
  },
  sv:{appTitle:'MDU Navigator',appSub:'Västerås · Eskilstuna',tNext:'Schema',tSearch:'Sök',tMap:'Karta',tPlaces:'Platser',tBus:'Buss',
   vas:'Västerås',esk:'Eskilstuna',
-  next:'Nästa pass',now:'Pågår nu',later:'Kommande',laterSame:'Senare samma dag',goTo:'Visa vägen till',online:'Online',deadline:'Inlämning',nextDeadline:'Nästa inlämning',
+  next:'Nästa pass',now:'Pågår nu',later:'Kommande',progress:'Hur mycket av passet som har gått',progDone:'{p} % klart',laterSame:'Senare samma dag',goTo:'Visa vägen till',online:'Online',deadline:'Inlämning',nextDeadline:'Nästa inlämning',
   notMapped:'Salen finns inte på kartan än',example:'Exempel',yours:'Ditt schema',
   myCourses:'Mina kurser',addCourse:'Lägg till en kurs',addHint:'Lägg till varje kurs du läser. Du kan lägga till hur många du vill.',
   linkPh:'Klistra in en schemalänk från KronoX',addLink:'Lägg till länk',orFile:'eller',uploadB:'Ladda upp .ics-filer från KronoX',
@@ -58,7 +58,7 @@ const T = {
   qph:'Sök: R2-142, A2-003, Omega, WC…',floor:'Plan',darkMode:'Mörkt läge',lightMode:'Ljust läge',showSteps:'Visa stegen ({n})',showStepsA:'Visa stegen',hideStepsA:'Dölj stegen',route:'Väg',mapOnly:'Bara karta',
   bR:'Hus R',bU:'Hus T/U',bE:'Huvudbyggnaden',bX:'Tentamenslokal',bRs:'R',bUs:'T/U',bEs:'A·B·C',bXs:'Tenta',
   from:'Från',change:'Ändra',tapHint:'Tryck på en sal på kartan, eller sök efter den under Sök.',
-  startAt:'Börja vid',takeUp:'gå upp',takeDown:'gå ner',toFloor:'till plan',walkTo:'Gå till',redMark:'den orange ringen på kartan.',
+  startAt:'Börja vid',takeUp:'gå upp',takeDown:'gå ner',toFloor:'till plan',walkTo:'Gå till',redMark:'markerad med den orange nålen på kartan.',
   linkStep:'Ta förbindelsegången till {b}, plan {f}',
   minsWalk:'Cirka {n} min promenad (uppskattning)',noRoute:'Ingen vägbeskrivning hit än. Platsen är markerad på kartan: {p}.',otherCampus:'Salen ligger i {c}. Se fliken Buss för MDU-bussen.',
   pickStart:'Var är du nu?',entrances:'Entréer',nearRoom:'Jag står vid sal…',tapMap:'Välj min plats på kartan',tapMapHint:'Tryck på salen närmast dig',
@@ -422,9 +422,36 @@ const LINKS={canvas:'https://lms.mdu.se/',adm:{en:'https://www.universityadmissi
   parkEsk:'https://www.eskilstuna.se/trafik-och-gator/parkering'};
 const PHONES={vas:{caretaker:'021-10 15 05',guard:'021-10 70 40'},esk:{caretaker:'016-15 37 70',guard:'016-15 32 40'},prop:'0771-90 80 00',castle:'018-56 48 28',crisis:'073-960 88 22',helpdesk:'016-15 51 50',studc:'021-10 13 10'};
 const tel=n=>'tel:'+n.replace(/[^\d+]/g,'');
-const ext=(href,title,desc,icon='↗')=>`<a class="item link" href="${href}" target="_blank" rel="noopener"><span class="ico" aria-hidden="true">${icon}</span><span><span class="t">${esc(title)}</span>${desc?`<br><span class="s">${esc(desc)}</span>`:''}</span><span class="tag">${icon==='☎'?t('call'):icon==='✉'?t('email'):t('web')}</span></a>`;
-const phoneRow=(label,n)=>ext(tel(n),label,n,'☎');
-const mailRow=(label,m)=>ext('mailto:'+m,label,m,'✉');
+/* Link rows: a small tile in each site's colour (letter or icon) instead of an arrow; the whole row opens the link.
+   Web links show a small "opens outside the app" icon at the end. */
+const SVGI={
+  phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
+  mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+  book:'<path d="M2 5h6a4 4 0 0 1 4 4v11a3 3 0 0 0-3-3H2z"/><path d="M22 5h-6a4 4 0 0 0-4 4v11a3 3 0 0 1 3-3h7z"/>',
+  card:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="11" r="2"/><path d="M6 16c.6-1.4 1.6-2 2.5-2s1.9.6 2.5 2M14 10h4M14 13h3"/>',
+  link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+  food:'<path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 3c-2 0-3 3-3 6s1 4 3 4v8"/>',
+  laptop:'<rect x="4" y="5" width="16" height="10" rx="1.5"/><path d="M2 19h20"/>',
+  ext:'<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>'};
+const svgi=(k,s=20)=>`<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SVGI[k]}</svg>`;
+const TILE={
+  adm:{bg:'#ffffff',fg:'#111111',ch:'A',line:true},
+  ladok:{bg:'#1b5e20',fg:'#fff',ch:'L'},
+  kronox:{bg:'#0d3b78',fg:'#fff',ch:'K'},
+  canvas:{bg:'#e4202d',fg:'#fff',ch:'C'},
+  canvasApp:{bg:'#e4202d',fg:'#fff',ic:'laptop'},
+  mdu:{bg:'#ff4900',fg:'#fff',ch:'M'},
+  it:{bg:'#ff4900',fg:'#fff',ic:'laptop'},
+  lib:{bg:'#ff4900',fg:'#fff',ic:'book'},
+  card:{bg:'#ff4900',fg:'#fff',ic:'card'},
+  phone:{bg:'#1f8a5b',fg:'#fff',ic:'phone'},
+  mail:{bg:'#2563eb',fg:'#fff',ic:'mail'},
+  food:{bg:'#8d6e63',fg:'#fff',ic:'food'},
+  link:{bg:"var(--bg)",fg:"var(--ink)",ic:"link",line:true}};
+const tileHtml=k=>{const s=TILE[k]||TILE.link;return `<span class="ltile${s.line?' line':''}" style="background:${s.bg};color:${s.fg}" aria-hidden="true">${s.ic?svgi(s.ic):s.ch}</span>`;};
+const ext=(href,title,desc,tile='link')=>{const web=/^https?:/.test(href);return `<a class="item link" href="${href}" ${web?'target="_blank" rel="noopener"':''}>${tileHtml(tile)}<span><span class="t">${esc(title)}</span>${desc?`<br><span class="s">${esc(desc)}</span>`:''}</span>${web?`<span class="lext" title="${esc(t('web'))}">${svgi('ext',18)}</span>`:'<span></span>'}</a>`;};
+const phoneRow=(label,n)=>ext(tel(n),label,n,'phone');
+const mailRow=(label,m)=>ext('mailto:'+m,label,m,'mail');
 function mapBtn(code){const r=BYCODE.get(norm(code));return r?`<button class="ghost small" type="button" data-room="${esc(r.key)}">${t('showMap')}: <span class="code">${esc(code)}</span></button>`:'';}
 const det=(title,body,open)=>`<details class="card fold"${open?' open':''}><summary>${esc(title)}</summary><div class="foldbody">${body}</div></details>`;
 const ul=arr=>`<ul class="tight">${arr.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
@@ -433,16 +460,16 @@ function renderInfo(){
   const el=document.getElementById('v-info'),c=campus,V=c==='vas';
   el.innerHTML=`<div class="seg big" role="group">${['vas','esk'].map(k=>`<button type="button" data-c="${k}" aria-pressed="${k===c}">${t(k)}</button>`).join('')}</div>
   <div class="card emergency"><div class="eyebrow">${t('emT')}</div>
-    <div class="row wrap" style="margin-top:8px"><a class="btn danger" href="tel:112">☎ ${t('em112')}</a><a class="btn sec" href="${tel(PHONES.crisis)}">${t('emCrisis')} <span class="code">${PHONES.crisis}</span></a></div>
+    <div class="embtns"><a class="emb e112" href="tel:112">${svgi('phone',22)}<span><b>112</b><small>${t('em112')}</small></span></a><a class="emb ecrisis" href="${tel(PHONES.crisis)}">${svgi('phone',20)}<span><b>${t('emCrisis')}</b><small class="code">${PHONES.crisis}</small></span></a></div>
     <p class="small muted" style="margin:10px 0 0">${t('emNote')}</p></div>
   ${det(t('violT'),ul(T[lang].viol))}
   ${det(t('fireT'),ul(T[lang].fire))}
   ${det(t('bleedT'),ul(T[lang].bleed))}
   ${det(t('aedT'),ul(V?T[lang].aedVas:T[lang].aedEsk)+`<p class="small muted">${t('aedNote')}</p>`)}
   <div class="card"><div class="eyebrow">${t('toolsT')}</div><div class="list">
-    ${ext(LINKS.adm[lang],t('tAdm'),t('tAdmD'))}${ext(LINKS.ladok,t('tLadok'),t('tLadokD'))}${ext(LINKS.kronox,t('tKronox'),t('tKronoxD'))}${ext(LINKS.canvas,t('tCanvas'),t('tCanvasD'))}${ext(LINKS.it,t('tPortal'),t('tPortalD'))}
-    ${ext(LINKS.canvasApp,t('tCanvasApp'),t('tCanvasAppD'))}${ext(LINKS.lib,t('tLib'),t('tLibD'))}${ext(LINKS.student,t('tStudent'),t('tStudentD'))}</div></div>
-  ${det(t('cardT'),ul(T[lang].card)+`<div class="list">${ext(LINKS.cardOrder,t('cardOrder'),'portal.mdu.se')}${ext(LINKS.cardInfo[lang],t('cardInfo'),'')}${phoneRow(t('tStudCentre'),PHONES.studc)}${mailRow(t('tStudCentre'),'studenttorget@mdu.se')}</div>`)}
+    ${ext(LINKS.adm[lang],t('tAdm'),t('tAdmD'),'adm')}${ext(LINKS.ladok,t('tLadok'),t('tLadokD'),'ladok')}${ext(LINKS.kronox,t('tKronox'),t('tKronoxD'),'kronox')}${ext(LINKS.canvas,t('tCanvas'),t('tCanvasD'),'canvas')}${ext(LINKS.it,t('tPortal'),t('tPortalD'),'it')}
+    ${ext(LINKS.canvasApp,t('tCanvasApp'),t('tCanvasAppD'),'canvasApp')}${ext(LINKS.lib,t('tLib'),t('tLibD'),'lib')}${ext(LINKS.student,t('tStudent'),t('tStudentD'),'mdu')}</div></div>
+  ${det(t('cardT'),ul(T[lang].card)+`<div class="list">${ext(LINKS.cardOrder,t('cardOrder'),'portal.mdu.se','card')}${ext(LINKS.cardInfo[lang],t('cardInfo'),'','mdu')}${phoneRow(t('tStudCentre'),PHONES.studc)}${mailRow(t('tStudCentre'),'studenttorget@mdu.se')}</div>`)}
   <div class="card"><div class="eyebrow">${t('helpT')}</div><div class="list">
     ${phoneRow(t('tHelpdesk'),PHONES.helpdesk)}${mailRow(t('tHelpdesk'),'helpdesk@mdu.se')}
     ${phoneRow(t('tStudCentre')+' · '+t('tStudCentreD'),PHONES.studc)}${mailRow(t('tStudCentre'),'studenttorget@mdu.se')}
@@ -456,7 +483,7 @@ function renderInfo(){
   ${det(t('quietT'),`<p class="small">${esc(V?t('quietVas'):t('quietEsk'))}</p>${V?'':mapBtn('B3-007')}`)}
   ${det(t('restT'),`<p class="small">${esc(V?t('restVas'):t('restEsk'))}</p>`)}
   ${det(t('lockT'),`<p class="small">${esc(V?t('lockVas'):t('lockEsk'))}</p><div class="row wrap">${V?mapBtn('U2-039')+mapBtn('R1-302'):mapBtn('A3-009')}</div>`)}
-  ${det(t('foodT'),`<div class="list">${V?ext(LINKS.rosenhill,'Restaurang Rosenhill','')+ext(LINKS.prego,'Prego Origo',''):ext(LINKS.verket,'Verket mat & kaffe','')}</div>`)}
+  ${det(t('foodT'),`<div class="list">${V?ext(LINKS.rosenhill,'Restaurang Rosenhill','','food')+ext(LINKS.prego,'Prego Origo','','food'):ext(LINKS.verket,'Verket mat & kaffe','','food')}</div>`)}
   ${det(t('parkT'),`<p class="small">${esc(V?t('parkVas'):t('parkEsk'))}</p>${V?'':`<a class="btn sec" href="${LINKS.parkEsk}" target="_blank" rel="noopener">eskilstuna.se ↗</a>`}`)}
   ${(typeof a2hsAvailable==='function'&&a2hsAvailable())?`<button class="btn sec" type="button" id="a2hsOpen" style="width:100%;margin-top:12px">📲 ${esc(t('a2hsTitle'))}</button>`:''}
   <p class="note">mdu.se · 2026</p>`;
@@ -514,6 +541,7 @@ function renderNext(){
       h+=`<article class="card next" style="border-top:4px solid ${COLORS[e.color%COLORS.length]}"><div class="row"><span class="eyebrow" style="flex:1">${label}</span>${live?`<span class="pill live">${t('endsIn')} ${fmtRel(e.end)}</span>`:`<span class="rel">${t('inX')} ${fmtRel(e.start)}</span>`}</div>
       <h2>${dot(e.color)}${esc(e.moment||e.course)}</h2><div class="muted small">${esc(e.moment?e.course:'')}${c?` · ${t(c)}`:''}</div>
       <div class="when" style="margin-top:8px">${fmtDay(e.start)} · <span class="code" style="font-weight:500">${fmtTime(e.start)}–${fmtTime(e.end)}</span></div>
+      ${live?`<div class="prog" role="progressbar" aria-label="${t('progress')}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(100*(now-e.start)/(e.end-e.start))}"><span style="width:${Math.min(100,Math.max(2,100*(now-e.start)/(e.end-e.start))).toFixed(1)}%;background:${COLORS[e.color%COLORS.length]}"></span></div><div class="progl"><span>${fmtTime(e.start)}</span><span>${t('progDone',{p:Math.round(100*(now-e.start)/(e.end-e.start))})}</span><span>${fmtTime(e.end)}</span></div>`:''}
       <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px">${locBlock(e)}</div>
       ${i===0?busHint(e):''}</article>`;
     });
@@ -655,8 +683,9 @@ function renderMap(){
     for(const s of route.segs.filter(s=>s.fk===floor)){
       const pts=s.pts.map(p=>p.x+','+p.y).join(' ');
       el('polyline',{points:pts,fill:'none',stroke:'#ffffff',"stroke-width":8,"stroke-linecap":"round","stroke-linejoin":"round",opacity:.9},svg);
-      el('polyline',{points:pts,fill:'none',stroke:'var(--route)',"stroke-width":4.5,"stroke-linecap":"round","stroke-linejoin":"round"},svg);
-      el('polyline',{points:pts,fill:'none',stroke:'#ffffff',"stroke-width":1.6,"stroke-dasharray":"4 8","stroke-linecap":"round",class:'routeline'},svg);
+      // see-through route: a blue line blended with the map (multiply), so room numbers under it stay readable
+      el('polyline',{points:pts,fill:'none',stroke:'var(--route)',"stroke-width":5,opacity:.42,"stroke-linecap":"round","stroke-linejoin":"round",class:'routebase'},svg);
+      el('polyline',{points:pts,fill:'none',stroke:'var(--route)',"stroke-width":1.8,opacity:.85,"stroke-dasharray":"5 7","stroke-linecap":"round",class:'routeline routebase'},svg);
     }
     for(const s of route.marks.filter(s=>s.fk===floor)){
       el('circle',{cx:s.x,cy:s.y,r:8,fill:'var(--stair)',stroke:'#fff',"stroke-width":2},svg);
@@ -664,11 +693,22 @@ function renderMap(){
     }
   }
   const sp=startPoint();
-  if(target&&sp&&sp.fk===floor){el('circle',{cx:sp.x,cy:sp.y,r:7,fill:'var(--start)',stroke:'#fff',"stroke-width":2.5},svg);}
+  if(target&&sp&&sp.fk===floor){
+    // start point: a soft green pulse around the dot so it is easy to spot
+    el('circle',{cx:sp.x,cy:sp.y,r:9,fill:'var(--start)',opacity:.35,class:'spulse'},svg);
+    el('circle',{cx:sp.x,cy:sp.y,r:8,fill:'var(--start)',stroke:'#fff',"stroke-width":3},svg);
+  }
   if(target&&target.fk===floor){
-    el('circle',{cx:target.x,cy:target.y,r:16,fill:'var(--target)',opacity:.14},svg);
-    el('circle',{cx:target.x,cy:target.y,r:16,fill:'none',stroke:'var(--target)',"stroke-width":3},svg);
-    el('circle',{cx:target.x,cy:target.y,r:20,fill:'none',stroke:'var(--target)',"stroke-width":1.5,opacity:.5,class:'pulse2'},svg);
+    // destination: the room number is redrawn in a clear label on top of the map (so nothing hides it),
+    // with an orange pin standing just above the label
+    const code=String(target.id||target.name||""), fs=8.5, w=code.length*fs*0.62+10, hgt=fs+6;
+    const g=el('g',{transform:`translate(${target.x} ${target.y})`},svg);
+    el('ellipse',{cx:0,cy:0,rx:w/2+4,ry:hgt/2+3,fill:'var(--target)',opacity:.3,class:'tpulse'},g);
+    el('rect',{x:-w/2,y:-hgt/2,width:w,height:hgt,rx:hgt/2,fill:'#fff',stroke:'var(--target)',"stroke-width":1.8},g);
+    const tx=el('text',{x:0,y:0.5,"text-anchor":'middle',"dominant-baseline":'middle',"font-size":fs,"font-weight":800,fill:'#141414',"font-family":'ui-monospace,Menlo,Consolas,monospace'},g);tx.textContent=code;
+    const pg=el('g',{transform:`translate(0 ${-hgt/2-1}) scale(.68)`,opacity:.88},g);
+    el('path',{d:'M0 0C-3.5-7-11-12.5-11-21A11 11 0 1 1 11-21C11-12.5 3.5-7 0 0Z',fill:'var(--target)',stroke:'#fff',"stroke-width":2.5,"stroke-linejoin":'round'},pg);
+    el('circle',{cx:0,cy:-21,r:4.5,fill:'#fff'},pg);
   }
   applyVB();
 }
