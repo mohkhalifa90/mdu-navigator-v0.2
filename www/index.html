@@ -34,7 +34,7 @@
     </section>
     <section class="view" id="v-map" aria-labelledby="tab-map">
       <div class="mapwrap">
-        <svg id="map" xmlns="http://www.w3.org/2000/svg"></svg>
+        <svg id="map" role="img" aria-label="Map" xmlns="http://www.w3.org/2000/svg"></svg>
         <div class="mapbar">
           <div class="seg" id="campSeg"></div>
           <div class="seg" id="bldSeg"></div>
@@ -54,6 +54,8 @@
     <div class="overlay" id="ov"><div class="dialog" id="dlg"></div></div>
     <div class="toast" id="toast" role="status"></div>
     <div class="a2hs" id="a2hs" role="dialog" aria-live="polite" hidden></div>
+    <div class="onb" id="onb" role="dialog" aria-modal="true" hidden><div class="ocard"></div></div>
+    <div id="sr" class="sr-only" aria-live="polite"></div>
   </main>
   <nav role="tablist">
     <button role="tab" id="tab-next" data-v="next" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span data-t="tNext"></span></button>

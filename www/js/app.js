@@ -2,7 +2,7 @@
 const T = {
  en:{appTitle:'MDU Navigator',appSub:'Västerås · Eskilstuna',tNext:'Schedule',tSearch:'Search',tMap:'Map',tPlaces:'Places',tBus:'Bus',
   vas:'Västerås',esk:'Eskilstuna',
-  next:'Next session',now:'Happening now',later:'Coming up',roomTba:'Room TBA',roomTbaLong:'No room booked yet in KronoX',progress:'How much of the session has passed',progDone:'{p}% done',laterSame:'Later the same day',goTo:'Take me to',online:'Online',deadline:'Deadline',nextDeadline:'Next deadline',
+  next:'Next session',now:'Happening now',later:'Coming up',updAgo:'Updated {t}',agoNow:'just now',agoMin:'{n} min ago',agoH:'{n} h ago',agoD:'{n} days ago',offline:'No internet. Showing your saved schedule from {t}.',syncFail:'KronoX didn’t answer. Your saved schedule is still here.',tryAgain:'Try again',noDay:'No classes this day 🎉',weekN:'Week {n}',pullRefresh:'Pull to update',releaseRefresh:'Release to update',refreshing:'Updating…',lastClass:'your last class',walkFrom:'{m} min walk from {r} · {g} min break',tight:'Tight',share:'Share',shareText:'Meet me at {r}',copied:'Link copied',recent:'Recent searches',courseRooms:'Rooms for {c}',didMean:'Did you mean',vib:'Vibrate on taps',onbHi:'Welcome to MDU Navigator',onbCampus:'Which campus do you study on?',both:'Both',onbNext:'Next',skip:'Skip',onbLater:'Later',onbSched:'Add your schedule',onbHome:'Keep it on your home screen',onbHomeD:'It opens like an app and works without internet.',done:'Done',onbLang:'Language',srRoute:'Route to {r}: {n} steps, about {m} min',floorN:'Floor {n}',prevWeek:'Previous week',nextWeek:'Next week',roomTba:'Room TBA',roomTbaLong:'No room booked yet in KronoX',progress:'How much of the session has passed',progDone:'{p}% done',laterSame:'Later the same day',goTo:'Take me to',online:'Online',deadline:'Deadline',nextDeadline:'Next deadline',
   notMapped:'This room isn’t on the map yet',example:'Example',yours:'Your schedule',
   myCourses:'My courses',addCourse:'Add a course',addHint:'Add each course you take. You can add as many as you like.',
   linkPh:'Paste a KronoX schedule link',addLink:'Add link',orFile:'or',uploadB:'Upload .ics files from KronoX',
@@ -47,7 +47,7 @@ const T = {
  },
  sv:{appTitle:'MDU Navigator',appSub:'Västerås · Eskilstuna',tNext:'Schema',tSearch:'Sök',tMap:'Karta',tPlaces:'Platser',tBus:'Buss',
   vas:'Västerås',esk:'Eskilstuna',
-  next:'Nästa pass',now:'Pågår nu',later:'Kommande',roomTba:'Sal ej klar',roomTbaLong:'Ingen sal bokad i KronoX än',progress:'Hur mycket av passet som har gått',progDone:'{p} % klart',laterSame:'Senare samma dag',goTo:'Visa vägen till',online:'Online',deadline:'Inlämning',nextDeadline:'Nästa inlämning',
+  next:'Nästa pass',now:'Pågår nu',later:'Kommande',updAgo:'Uppdaterat {t}',agoNow:'nyss',agoMin:'för {n} min sedan',agoH:'för {n} h sedan',agoD:'för {n} dagar sedan',offline:'Inget internet. Visar ditt sparade schema från {t}.',syncFail:'KronoX svarade inte. Ditt sparade schema finns kvar.',tryAgain:'Försök igen',noDay:'Inga pass den här dagen 🎉',weekN:'Vecka {n}',pullRefresh:'Dra för att uppdatera',releaseRefresh:'Släpp för att uppdatera',refreshing:'Uppdaterar…',lastClass:'ditt förra pass',walkFrom:'{m} min promenad från {r} · {g} min rast',tight:'Tajt',share:'Dela',shareText:'Vi ses vid {r}',copied:'Länken kopierad',recent:'Senaste sökningar',courseRooms:'Salar för {c}',didMean:'Menade du',vib:'Vibrera vid tryck',onbHi:'Välkommen till MDU Navigator',onbCampus:'Vilket campus studerar du på?',both:'Båda',onbNext:'Nästa',skip:'Hoppa över',onbLater:'Senare',onbSched:'Lägg till ditt schema',onbHome:'Ha den på hemskärmen',onbHomeD:'Den öppnas som en app och fungerar utan internet.',done:'Klar',onbLang:'Språk',srRoute:'Väg till {r}: {n} steg, cirka {m} min',floorN:'Plan {n}',prevWeek:'Förra veckan',nextWeek:'Nästa vecka',roomTba:'Sal ej klar',roomTbaLong:'Ingen sal bokad i KronoX än',progress:'Hur mycket av passet som har gått',progDone:'{p} % klart',laterSame:'Senare samma dag',goTo:'Visa vägen till',online:'Online',deadline:'Inlämning',nextDeadline:'Nästa inlämning',
   notMapped:'Salen finns inte på kartan än',example:'Exempel',yours:'Ditt schema',
   myCourses:'Mina kurser',addCourse:'Lägg till en kurs',addHint:'Lägg till varje kurs du läser. Du kan lägga till hur många du vill.',
   linkPh:'Klistra in en schemalänk från KronoX',addLink:'Lägg till länk',orFile:'eller',uploadB:'Ladda upp .ics-filer från KronoX',
@@ -301,10 +301,11 @@ async function addLink(url,quiet){
   try{const ev=await fetchICS(url);addSchedule(ev,'link',kronoxICS(url));if(!quiet)toast(t('loaded',{n:ev.length}));renderNext();return true;}
   catch(e){if(!quiet)toast(e.canvas?t('linkCanvas'):IS_NATIVE?t('linkFail'):t('linkWeb'));return false;}
 }
+var SYNC_FAIL=false;
 async function refreshAll(quiet){
   const links=SCHEDS.filter(s=>s.source==='link'&&s.url);if(!links.length)return;
   let ok=0;for(const s of links){try{s.events=await fetchICS(s.url);s.fetched=Date.now();ok++;}catch(e){}}
-  saveScheds();renderNext();if(!quiet)toast(ok?t('updatedAll'):(IS_NATIVE?t('linkFail'):t('linkWeb')));
+  SYNC_FAIL=!ok;saveScheds();renderNext();if(!quiet)toast(ok?t('updatedAll'):(IS_NATIVE?t('linkFail'):t('linkWeb')));
 }
 
 /* ---------- time helpers (Europe/Stockholm) ---------- */
@@ -321,6 +322,8 @@ function fmtDay(ms){
   return new Intl.DateTimeFormat(loc(),{timeZone:TZ,weekday:'long',day:'numeric',month:'short'}).format(d);
 }
 const fmtTime=ms=>new Intl.DateTimeFormat(loc(),{timeZone:TZ,hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date(ms));
+function agoText(ms){const m=Math.round((Date.now()-ms)/60000);if(m<1)return t('agoNow');if(m<60)return t('agoMin',{n:m});const h=Math.round(m/60);if(h<48)return t('agoH',{n:h});return t('agoD',{n:Math.round(h/24)});}
+function isoWeek(d){const x=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const n=x.getUTCDay()||7;x.setUTCDate(x.getUTCDate()+4-n);const y=new Date(Date.UTC(x.getUTCFullYear(),0,1));return Math.ceil(((x-y)/864e5+1)/7);}
 function fmtRel(ms){
   let m=Math.round((ms-Date.now())/60000);
   if(m<60) return `${Math.max(m,0)} ${t('min')}`;
@@ -384,7 +387,7 @@ Object.assign(T.en,{tInfo:'Student',
   quietT:'Quiet room',quietVas:'R building, floor 2. Open to everyone at all times; it can’t be booked.',quietEsk:'Room B3-007, floor 3. Open to everyone at all times; it can’t be booked.',
   restT:'Rest room',restVas:'T1-063, floor 1. Borrow the key or card at Studenttorget for up to 2 hours; bring ID.',restEsk:'A4-062, floor 4. Borrow the key or card at Studenttorget for up to 2 hours; bring ID.',
   lockT:'Lockers',lockVas:'Borrow for up to 12 hours, by U2-039 and by R1-302. Lock them only with your MDU card.',lockEsk:'Borrow for up to 12 hours, on floor 3 by A3-009. Lock them only with your MDU card.',
-  libT:'Library hours',lib:'Students: every day 07–22 with MDU card and PIN. Public: Mon–Thu 08–19, Fri 08–16.',
+  libT:'Library hours',libHours:'Students: every day 07–22 with MDU card and PIN. Public: Mon–Thu 08–19, Fri 08–16.',
   foodT:'Restaurants and cafés',parkT:'Parking',parkVas:'Pay with Mobill, E-park or Aimo Park depending on the car park. Students get a reduced rate with a parking permit from Studenttorget.',parkEsk:'No parking just for MDU students. See the municipality’s map of car parks and fees.',
   tAdm:'University Admissions',tAdmD:'Apply for courses and programmes at MDU and other Swedish universities',
   cardT:'Lost your MDU card?',card:['Report the loss at Studenttorget. They block the old card so you can order a new one.','Blocking costs SEK 100, paid on site at Studenttorget, and you must show valid ID. It is free if you bring a police report about the loss.','60 minutes after the card is blocked, order a new card yourself (link below). Use a colour photo taken from the front, with both eyes visible and a light background.','Collect the new card at the campus you chose. Bring valid ID; digital ID is not accepted.'],cardOrder:'Order a new MDU card',cardInfo:'The MDU card on mdu.se',
@@ -409,7 +412,7 @@ Object.assign(T.sv,{tInfo:'Student',
   quietT:'Stilla rummet',quietVas:'Hus R, plan 2. Öppet för alla hela dagen; kan inte bokas.',quietEsk:'Sal B3-007, plan 3. Öppet för alla hela dagen; kan inte bokas.',
   restT:'Vilrum',restVas:'T1-063, plan 1. Låna nyckel eller passerkort på Studenttorget i upp till 2 timmar; ta med legitimation.',restEsk:'A4-062, plan 4. Låna nyckel eller passerkort på Studenttorget i upp till 2 timmar; ta med legitimation.',
   lockT:'Låsbara skåp',lockVas:'Lånas i upp till 12 timmar, vid U2-039 och vid R1-302. Lås bara med ditt MDU-kort.',lockEsk:'Lånas i upp till 12 timmar, på plan 3 vid A3-009. Lås bara med ditt MDU-kort.',
-  libT:'Bibliotekets öppettider',lib:'Studenter: alla dagar 07–22 med MDU-kort och PIN. Allmänheten: mån–tor 08–19, fre 08–16.',
+  libT:'Bibliotekets öppettider',libHours:'Studenter: alla dagar 07–22 med MDU-kort och PIN. Allmänheten: mån–tor 08–19, fre 08–16.',
   foodT:'Restauranger och kaféer',parkT:'Parkering',parkVas:'Betala med Mobill, E-park eller Aimo Park beroende på parkering. Studenter betalar reducerat pris med parkeringstillstånd från Studenttorget.',parkEsk:'Det finns ingen parkering just för MDU-studenter. Se kommunens karta över parkeringar och avgifter.',
   tAdm:'Antagning.se',tAdmD:'Sök kurser och program på MDU och andra svenska lärosäten',
   cardT:'Tappat ditt MDU-kort?',card:['Anmäl förlusten på Studenttorget. De spärrar det gamla kortet så att du kan beställa ett nytt.','Spärren kostar 100 kronor, som betalas på plats på Studenttorget, och du måste visa giltig legitimation. Den är gratis om du har en polisanmälan om förlusten.','60 minuter efter att kortet spärrats beställer du själv ett nytt kort (länk nedan). Använd ett färgfoto taget rakt framifrån, med båda ögonen synliga och ljus bakgrund.','Hämta det nya kortet på det campus du valt. Ta med giltig legitimation; digitalt ID godkänns inte.'],cardOrder:'Beställ ett nytt MDU-kort',cardInfo:'MDU-kortet på mdu.se',
@@ -434,7 +437,14 @@ const SVGI={
   link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
   food:'<path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 3c-2 0-3 3-3 6s1 4 3 4v8"/>',
   laptop:'<rect x="4" y="5" width="16" height="10" rx="1.5"/><path d="M2 19h20"/>',
-  ext:'<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>'};
+  ext:'<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+  door:'<path d="M5 21V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v17M3 21h18"/><circle cx="15" cy="12" r="1"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+  moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+  heart:'<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/><path d="M12.5 8.5 10.5 12h3l-2 3.5"/>',
+  board:'<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20l4-4 4 4"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  wc:'<circle cx="8" cy="5" r="1.6"/><circle cx="16" cy="5" r="1.6"/><path d="M8 8v12M6 9h4v6H6zM16 8l-2.5 7h5zM16 15v5"/>'};
 const svgi=(k,s=20)=>`<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SVGI[k]}</svg>`;
 const TILE={
   adm:{bg:'#ffffff',fg:'#111111',ch:'A',line:true},
@@ -449,7 +459,10 @@ const TILE={
   phone:{bg:'#1f8a5b',fg:'#fff',ic:'phone'},
   mail:{bg:'#2563eb',fg:'#fff',ic:'mail'},
   food:{bg:'#8d6e63',fg:'#fff',ic:'food'},
-  link:{bg:"var(--bg)",fg:"var(--ink)",ic:"link",line:true}};
+  link:{bg:"var(--bg)",fg:"var(--ink)",ic:"link",line:true},
+  entr:{bg:'#1f8a5b',fg:'#fff',ic:'door'},help:{bg:'#2563eb',fg:'#fff',ic:'info'},quiet:{bg:'#6d4bc4',fg:'#fff',ic:'moon'},
+  wc:{bg:'#0e7490',fg:'#fff',ic:'wc'},aed:{bg:'#c62828',fg:'#fff',ic:'heart'},halls:{bg:'#0d3b78',fg:'#fff',ic:'board'},clock:{bg:'#ff4900',fg:'#fff',ic:'clock'}};
+const PLACE_TILE={entr:'entr',help:'help',food:'food',lib:'lib',quiet:'quiet',wc:'wc',aed:'aed',halls:'halls'};
 const tileHtml=k=>{const s=TILE[k]||TILE.link;return `<span class="ltile${s.line?' line':''}" style="background:${s.bg};color:${s.fg}" aria-hidden="true">${s.ic?svgi(s.ic):s.ch}</span>`;};
 const ext=(href,title,desc,tile='link')=>{const web=/^https?:/.test(href);return `<a class="item link" href="${href}" ${web?'target="_blank" rel="noopener"':''}>${tileHtml(tile)}<span><span class="t">${esc(title)}</span>${desc?`<br><span class="s">${esc(desc)}</span>`:''}</span>${web?`<span class="lext" title="${esc(t('web'))}">${svgi('ext',18)}</span>`:`<span class="lact ${tile}">${svgi(tile,15)}${esc(tile==='phone'?t('call'):t('email'))}</span>`}</a>`;};
 const phoneRow=(label,n)=>ext(tel(n),label,n,'phone');
@@ -480,7 +493,7 @@ function renderInfo(){
     ${mailRow('Lokalservice','lokalservice@mdu.se')}${phoneRow(t('caretaker'),PHONES[c].caretaker)}${phoneRow(t('guard'),PHONES[c].guard)}${phoneRow(t('propEm'),PHONES.prop)}${V?phoneRow(t('castle'),PHONES.castle):''}</div></div>
   <div class="eyebrow">${t('campusT')}</div>
   ${det(t('groupT'),ul(T[lang].group)+`<a class="btn sec" href="${LINKS.kronox}" target="_blank" rel="noopener">KronoX ↗</a>`)}
-  ${det(t('libT'),`<p class="small">${esc(t('lib'))}</p>`)}
+  ${det(t('libT'),`<p class="small">${esc(t('libHours'))}</p>`)}
   ${det(t('kitchT'),`<p class="small">${esc(V?t('kitchVas'):t('kitchEsk'))}</p>`)}
   ${det(t('quietT'),`<p class="small">${esc(V?t('quietVas'):t('quietEsk'))}</p>${V?'':mapBtn('B3-007')}`)}
   ${det(t('restT'),`<p class="small">${esc(V?t('restVas'):t('restEsk'))}</p>`)}
@@ -488,8 +501,10 @@ function renderInfo(){
   ${det(t('foodT'),`<div class="list">${V?ext(LINKS.rosenhill,'Restaurang Rosenhill','','food')+ext(LINKS.prego,'Prego Origo','','food'):ext(LINKS.verket,'Verket mat & kaffe','','food')}</div>`)}
   ${det(t('parkT'),`<p class="small">${esc(V?t('parkVas'):t('parkEsk'))}</p>${V?'':`<a class="btn sec" href="${LINKS.parkEsk}" target="_blank" rel="noopener">eskilstuna.se ↗</a>`}`)}
   ${(typeof a2hsAvailable==='function'&&a2hsAvailable())?`<button class="btn sec" type="button" id="a2hsOpen" style="width:100%;margin-top:12px">📲 ${esc(t('a2hsTitle'))}</button>`:''}
+  ${IS_NATIVE?`<label class="chk" style="margin:4px 2px"><input type="checkbox" id="vibChk" ${store.get('mdu.vib')!==false?'checked':''}> ${t('vib')}</label>`:''}
   <p class="note">mdu.se · 2026</p>`;
   el.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{setCampus(b.dataset.c);renderInfo();});
+  const vc=el.querySelector('#vibChk');vc&&(vc.onchange=()=>{store.set('mdu.vib',vc.checked);if(vc.checked)buzz();});
   el.querySelectorAll('[data-room]').forEach(b=>b.onclick=()=>goRoom(BYKEY.get(b.dataset.room)));
   const ao=el.querySelector('#a2hsOpen');if(ao)ao.onclick=()=>showA2HS();
 }
@@ -500,6 +515,12 @@ if(!['next','search','map','places','bus','info'].includes(view))view='next';
 let campus=store.get('mdu.campus')||'vas', bld=CAMPUS[campus].blds[0], floor=BUILD[bld].floors[0];
 let target=null, start=store.get('mdu.start2')||null;
 let route=null, tapMode=null, curStep=-1, busFrom=store.get('mdu.busfrom')||'vas';
+/* light vibration on important taps (Android app only; can be turned off in the Student tab) */
+function buzz(){try{if(IS_NATIVE&&store.get('mdu.vib')!==false&&navigator.vibrate)navigator.vibrate(12);}catch(e){}}
+/* screen readers: read out short status changes (route found, day changed …) */
+function say(m){const s=document.getElementById('sr');if(s){s.textContent='';setTimeout(()=>s.textContent=m,60);}}
+const PUBLIC_URL='https://mohkhalifa90.github.io/mdu-navigator-v0.2/';
+let selDay=null; // day picked in the week strip (YYYY-MM-DD); null = today
 const roomCode=r=>`<span class="code">${esc(r.id)}</span>`;
 const dot=c=>`<span class="cdot" style="background:${COLORS[c%COLORS.length]}"></span>`;
 
@@ -525,53 +546,91 @@ function locBlock(e){
   return L.rooms.map(r=>r.unknown?`<div class="roomchip">${roomCode(r)}<span class="muted small">${t('notMapped')}</span></div>`:
     `<div class="row wrap"><div class="roomchip">${roomCode(r)}<span class="muted small">${placeLabel(r)}</span></div><button class="btn" type="button" data-go="${esc(r.key)}" style="flex:1;min-width:150px">${t('goTo')} <span class="code">${esc(r.id)}</span></button></div>`).join('');
 }
-function renderNext(){
-  const el=document.getElementById('v-next');
-  const now=Date.now(), evs=allEvents().filter(e=>e.end>now);
-  const sessions=evs.filter(e=>!e.deadline), nextDl=evs.find(e=>e.deadline);
-  let h=`<div class="row"><span class="pill ${SCHEDS.length?'':'warn'}">${t(SCHEDS.length?'yours':'example')}</span><span style="flex:1"></span>${SCHEDS.some(s=>s.source==='link')?`<button class="ghost" id="refAll" type="button">${t('refreshAll')}</button>`:''}</div>`;
-  if(!sessions.length){h+=`<div class="card muted">${t('noMore')}</div>`;}
-  else{
-    /* Every remaining session on the same day as the next one gets its own card at the top,
-       each in its course colour; sessions in a room get the "Take me to" button, online ones don't. */
-    const dayKey=x=>new Date(x).toDateString(), d0=dayKey(sessions[0].start);
-    var featured=sessions.filter(x=>dayKey(x.start)===d0||x.start<=now);
-    let shownFuture=false;
-    featured.forEach((e,i)=>{
-      const live=e.start<=now,c=eventCampus(e);
-      const label=live?t('now'):(!shownFuture?t('next'):t('laterSame'));
-      if(!live)shownFuture=true;
-      h+=`<article class="card next" style="border-top:4px solid ${COLORS[e.color%COLORS.length]}"><div class="row"><span class="eyebrow" style="flex:1">${label}</span>${live?`<span class="pill live">${t('endsIn')} ${fmtRel(e.end)}</span>`:`<span class="rel">${t('inX')} ${fmtRel(e.start)}</span>`}</div>
+function evRow(e,i){
+  const L=parseLoc(e.location),r=L.rooms[0];
+  const tag=e.deadline?`<span class="tag dl">${t('deadline')}</span>`:L.type==='online'?`<span class="tag">💻 ${esc(L.label)}</span>`:L.type==='tba'?`<span class="tag">⏳ ${t('roomTba')}</span>`:r?(r.unknown?`<span class="tag">${roomCode(r)}</span>`:`<span class="tag go">${roomCode(r)}</span><span class="gopill">${t('goTo')} ›</span>`):'';
+  return `<button class="item ev" type="button" data-ev="${i}" style="--cc:${COLORS[e.color%COLORS.length]}"><span class="evtime"><b>${fmtTime(e.start)}</b>${e.deadline?'':`<span>${fmtTime(e.end)}</span>`}</span><span class="evbody"><span class="t">${esc(e.moment||e.course)}</span>${e.moment?`<span class="s">${esc(e.course)}</span>`:''}${tag?`<span class="evtag">${tag}</span>`:''}</span></button>`;
+}
+/* minutes to walk between two rooms (uses the normal route search, without touching what is on screen) */
+function walkMins(a,b){
+  if(!a||!b||a.campus!==b.campus||!canRoute(a)||!canRoute(b))return null;
+  const sv=[target,start,route,curStep,AUTO_OK];
+  target=b;start={type:'room',key:a.key};AUTO_OK=false;let m=null;
+  try{computeRoute();m=route&&!route.same?route.mins:(route?0:null);}catch(x){}
+  [target,start,route,curStep,AUTO_OK]=sv;return m;
+}
+const knownRoom=e=>{const L=parseLoc(e.location);return L.rooms.find(x=>!x.unknown)||null;};
+function heroCard(e,i,now,prevSess){
+  const live=e.start<=now,c=eventCampus(e);
+  const label=live?t('now'):(i===0||prevSess&&prevSess.start<=now?t('next'):t('laterSame'));
+  let walk='';
+  if(!live&&prevSess){const a=knownRoom(prevSess),b=knownRoom(e);
+    if(a&&b&&a.key!==b.key){const m=walkMins(a,b),g=Math.round((e.start-prevSess.end)/60000);
+      if(m!=null&&g>=0&&g<=90)walk=`<div class="walkline ${m+3>g?'tight':''}">🚶 ${m+3>g?`<b>${t('tight')}!</b> `:''}${t('walkFrom',{m,r:esc(a.id),g})}</div>`;}}
+  const pct=Math.round(100*(now-e.start)/(e.end-e.start));
+  return `<article class="card next" style="border-top:4px solid ${COLORS[e.color%COLORS.length]}"><div class="row"><span class="eyebrow" style="flex:1">${label}</span>${live?`<span class="pill live">${t('endsIn')} ${fmtRel(e.end)}</span>`:`<span class="rel">${t('inX')} ${fmtRel(e.start)}</span>`}</div>
       <h2>${dot(e.color)}${esc(e.moment||e.course)}</h2><div class="muted small">${esc(e.moment?e.course:'')}${c?` · ${t(c)}`:''}</div>
       <div class="when" style="margin-top:8px">${fmtDay(e.start)} · <span class="code" style="font-weight:500">${fmtTime(e.start)}–${fmtTime(e.end)}</span></div>
-      ${live?`<div class="prog" role="progressbar" aria-label="${t('progress')}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(100*(now-e.start)/(e.end-e.start))}"><span style="width:${Math.min(100,Math.max(2,100*(now-e.start)/(e.end-e.start))).toFixed(1)}%;background:${COLORS[e.color%COLORS.length]}"></span></div><div class="progl"><span>${fmtTime(e.start)}</span><span>${t('progDone',{p:Math.round(100*(now-e.start)/(e.end-e.start))})}</span><span>${fmtTime(e.end)}</span></div>`:''}
+      ${live?`<div class="prog" role="progressbar" aria-label="${t('progress')}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"><span style="width:${Math.min(100,Math.max(2,pct))}%;background:${COLORS[e.color%COLORS.length]}"></span></div><div class="progl"><span>${fmtTime(e.start)}</span><span>${t('progDone',{p:pct})}</span><span>${fmtTime(e.end)}</span></div>`:''}
+      ${walk}
       <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px">${locBlock(e)}</div>
       ${i===0?busHint(e):''}</article>`;
-    });
+}
+function weekStrip(evs,today,sel){
+  const d=new Date(sel+'T12:00:00'),wd=(d.getDay()+6)%7,mon=new Date(d);mon.setDate(d.getDate()-wd);
+  const has=new Set(evs.filter(e=>!e.deadline).map(e=>dayKey(e.start)));
+  let h=`<div class="week" role="group" aria-label="${t('weekN',{n:isoWeek(d)})}"><div class="wkhead"><button class="ghost wnav" type="button" data-wk="-7" aria-label="${t('prevWeek')}">‹</button><span>${t('weekN',{n:isoWeek(d)})}</span><button class="ghost wnav" type="button" data-wk="7" aria-label="${t('nextWeek')}">›</button></div><div class="wkdays">`;
+  for(let k=0;k<7;k++){const x=new Date(mon);x.setDate(mon.getDate()+k);const key=dayKey(x.getTime());
+    const n=evs.filter(e=>!e.deadline&&dayKey(e.start)===key).length;
+    const lab=new Intl.DateTimeFormat(loc(),{weekday:'short'}).format(x).replace('.','');
+    h+=`<button type="button" class="wd ${key===sel?'on':''} ${key===today?'today':''}" data-day="${key}" aria-pressed="${key===sel}" aria-label="${esc(fmtDay(x.getTime()))}, ${t('sessions',{n})}"><span>${esc(lab)}</span><b>${x.getDate()}</b><i class="${has.has(key)?'has':''}"></i></button>`;}
+  return h+`</div></div>`;
+}
+var EVL=[];
+function renderNext(){
+  const el=document.getElementById('v-next');
+  const now=Date.now(), all=allEvents(), evs=all.filter(e=>e.end>now);
+  const today=dayKey(now); if(!selDay)selDay=today; const sel=selDay;
+  const sessions=evs.filter(e=>!e.deadline), nextDl=evs.find(e=>e.deadline);
+  const last=SCHEDS.length?Math.max(...SCHEDS.map(s=>s.fetched||0)):0;
+  EVL=[];
+  let h=`<div id="ptr" class="ptr" aria-hidden="true"><span>↓</span> <em>${t('pullRefresh')}</em></div>`;
+  h+=`<div class="row"><span class="schedhead"><span class="pill ${SCHEDS.length?'':'warn'}">${t(SCHEDS.length?'yours':'example')}</span>${last?`<small class="upd">${t('updAgo',{t:agoText(last)})}</small>`:''}</span><span style="flex:1"></span>${SCHEDS.some(s=>s.source==='link')?`<button class="ghost" id="refAll" type="button">${t('refreshAll')}</button>`:''}</div>`;
+  if(!navigator.onLine&&last) h+=`<div class="banner warn">📶 ${t('offline',{t:fmtTime(last)})}</div>`;
+  else if(SYNC_FAIL) h+=`<div class="banner warn">⚠️ ${t('syncFail')} <button class="ghost" type="button" id="retry">${t('tryAgain')}</button></div>`;
+  h+=weekStrip(all,today,sel);
+  h+=`<div class="daybox" id="daybox">`;
+  var featured=[];
+  if(sel===today){
+    if(!sessions.length){h+=`<div class="card muted">${t('noMore')}</div>`;}
+    else{
+      /* Every remaining session on the same day as the next one gets its own card, in its course colour */
+      const d0=dayKey(sessions[0].start);
+      featured=sessions.filter(x=>dayKey(x.start)===d0||x.start<=now);
+      featured.forEach((e,i)=>{const prev=[...all].filter(x=>!x.deadline&&x.end<=e.start&&dayKey(x.start)===dayKey(e.start)).pop();h+=heroCard(e,i,now,prev);});
+    }
+    if(nextDl) h+=`<div class="card deadline row">${dot(nextDl.color)}<span style="flex:1"><span class="eyebrow">${t('nextDeadline')}</span><br><b>${esc(nextDl.moment||nextDl.course)}</b><br><span class="muted small">${esc(nextDl.course)}</span></span><span class="small" style="text-align:end"><b>${fmtDay(nextDl.start)}</b><br><span class="code">${fmtTime(nextDl.start)}</span></span></div>`;
+  }else{
+    const dl=all.filter(e=>dayKey(e.start)===sel);
+    h+=`<div class="eyebrow">${fmtDay(new Date(sel+'T12:00:00').getTime())}</div>`;
+    if(!dl.length)h+=`<div class="card empty">${t('noDay')}${SCHEDS.length?'':`<br><a href="#" id="toAdd">${t('addCourse')}</a>`}</div>`;
+    else h+=`<div class="card list evlist">${dl.map(e=>{EVL.push(e);return evRow(e,EVL.length-1);}).join('')}</div>`;
   }
-  if(nextDl) h+=`<div class="card deadline row">${dot(nextDl.color)}<span style="flex:1"><span class="eyebrow">${t('nextDeadline')}</span><br><b>${esc(nextDl.moment||nextDl.course)}</b><br><span class="muted small">${esc(nextDl.course)}</span></span><span class="small" style="text-align:end"><b>${fmtDay(nextDl.start)}</b><br><span class="code">${fmtTime(nextDl.start)}</span></span></div>`;
-  const feat=new Set(typeof featured!=='undefined'?featured:[]);
+  h+=`</div>`;
+  const feat=new Set(featured);
   const rest=evs.filter(e=>!feat.has(e)&&e!==nextDl).slice(0,10);
   if(rest.length){
-    /* Coming up: grouped by day; each session is a row with a course-colour bar, the time on the left,
-       and the title, course and room stacked so long KronoX text never squeezes into a narrow column */
     h+=`<div class="eyebrow">${t('later')}</div><div class="card list evlist">`;
     let lastDay='';
-    rest.forEach((e,i)=>{
-      const L=parseLoc(e.location),r=L.rooms[0];
-      const tag=e.deadline?`<span class="tag dl">${t('deadline')}</span>`:L.type==='online'?`<span class="tag">💻 ${esc(L.label)}</span>`:L.type==='tba'?`<span class="tag">⏳ ${t('roomTba')}</span>`:r?(r.unknown?`<span class="tag">${roomCode(r)}</span>`:`<span class="tag go">${roomCode(r)}</span><span class="gopill">${t('goTo')} ›</span>`):'';
-      const dk=new Date(e.start).toDateString();
-      if(dk!==lastDay){lastDay=dk;h+=`<div class="evday">${fmtDay(e.start)}</div>`;}
-      h+=`<button class="item ev" type="button" data-ev="${i}" style="--cc:${COLORS[e.color%COLORS.length]}"><span class="evtime"><b>${fmtTime(e.start)}</b>${e.deadline?'':`<span>${fmtTime(e.end)}</span>`}</span><span class="evbody"><span class="t">${esc(e.moment||e.course)}</span>${e.moment?`<span class="s">${esc(e.course)}</span>`:''}${tag?`<span class="evtag">${tag}</span>`:''}</span></button>`;
-    });
+    rest.forEach(e=>{const dk=dayKey(e.start);if(dk!==lastDay){lastDay=dk;h+=`<div class="evday">${fmtDay(e.start)}</div>`;}EVL.push(e);h+=evRow(e,EVL.length-1);});
     h+=`</div>`;
   }
   // my courses
-  h+=`<div class="card"><div class="eyebrow">${t('myCourses')}</div>`;
+  h+=`<div class="card" id="myc"><div class="eyebrow">${t('myCourses')}</div>`;
   if(!SCHEDS.length) h+=`<p class="small muted" style="margin:6px 0 0">${t('exampleNote')}</p>`;
   else h+=`<div class="list" style="margin-top:4px">${SCHEDS.map(s=>`<div class="item course">${dot(s.color)}<span><span class="t">${esc(s.name)}</span><br><span class="s">${s.source==='link'?t('fromLink'):t('fromFile')} · ${t('sessions',{n:s.events.length})} · ${esc(t('updated',{t:fmtDay(s.fetched)+' '+fmtTime(s.fetched)}))}</span></span><button class="ghost" type="button" data-rm="${s.id}">${t('remove')}</button></div>`).join('')}</div>`;
   h+=`</div>
-   <div class="card"><div class="eyebrow">${t('addCourse')}</div><p class="small muted" style="margin:4px 0 0">${t('addHint')}</p>
+   <div class="card" id="addc"><div class="eyebrow">${t('addCourse')}</div><p class="small muted" style="margin:4px 0 0">${t('addHint')}</p>
     <label class="search" for="icsUrl" style="margin-top:10px"><input id="icsUrl" type="url" inputmode="url" autocomplete="off" placeholder="${t('linkPh')}" aria-label="${t('linkPh')}"></label>
     <button class="btn" type="button" id="icsAdd" style="width:100%;margin-top:8px">${t('addLink')}</button>
     <div class="muted small" style="text-align:center;margin:8px 0 2px">${t('orFile')}</div>
@@ -579,14 +638,32 @@ function renderNext(){
     <ol class="steps-how"><li>${t('how1')}</li><li>${t('how2')}</li><li>${t('how3')}</li></ol></div>
     <p class="note">${t('dataNote')}</p>`;
   el.innerHTML=h;
-  el.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>goRoom(BYKEY.get(b.dataset.go)));
-  el.querySelectorAll('[data-ev]').forEach(b=>b.onclick=()=>{const r=parseLoc(rest[+b.dataset.ev].location).rooms.find(x=>!x.unknown);if(r)goRoom(r);});
+  el.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{buzz();goRoom(BYKEY.get(b.dataset.go));});
+  el.querySelectorAll('[data-ev]').forEach(b=>b.onclick=()=>{const r=knownRoom(EVL[+b.dataset.ev]);if(r){buzz();goRoom(r);}});
   el.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{if(!b.dataset.sure){b.dataset.sure=1;b.textContent=t('sure');return;}SCHEDS=SCHEDS.filter(s=>s.id!==b.dataset.rm);saveScheds();renderNext();});
+  el.querySelectorAll('[data-day]').forEach(b=>b.onclick=()=>{selDay=b.dataset.day;renderNext();say(b.getAttribute('aria-label'));});
+  el.querySelectorAll('[data-wk]').forEach(b=>b.onclick=()=>shiftDay(+b.dataset.wk));
   const f=el.querySelector('#icsFile');f.onchange=async()=>{let n=0,bad=0;for(const file of f.files){const ev=parseICS(await file.text());if(ev){addSchedule(ev,'file');n+=ev.length;}else bad++;}
-    toast(bad&&!n?t('badFile'):t('loaded',{n}));renderNext();};
-  el.querySelector('#icsAdd').onclick=()=>{const u=el.querySelector('#icsUrl').value.trim();if(u)addLink(u,false);};
+    toast(bad&&!n?t('badFile'):t('loaded',{n}));if(n)buzz();renderNext();};
+  el.querySelector('#icsAdd').onclick=async()=>{const u=el.querySelector('#icsUrl').value.trim();if(u&&await addLink(u,false))buzz();};
   const ra=el.querySelector('#refAll');ra&&(ra.onclick=()=>refreshAll(false));
+  const rt=el.querySelector('#retry');rt&&(rt.onclick=()=>refreshAll(false));
+  const ta=el.querySelector('#toAdd');ta&&(ta.onclick=ev=>{ev.preventDefault();el.querySelector('#addc').scrollIntoView({behavior:'smooth'});});
+  // swipe left / right on the day to change day
+  const db=el.querySelector('#daybox');let sx=null,sy=null;
+  db.addEventListener('touchstart',ev=>{sx=ev.touches[0].clientX;sy=ev.touches[0].clientY;},{passive:true});
+  db.addEventListener('touchend',ev=>{if(sx==null)return;const dx=ev.changedTouches[0].clientX-sx,dy=ev.changedTouches[0].clientY-sy;sx=null;if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.5)shiftDay(dx<0?1:-1);},{passive:true});
 }
+function shiftDay(n){const d=new Date((selDay||dayKey(Date.now()))+'T12:00:00');d.setDate(d.getDate()+n);selDay=dayKey(d.getTime());renderNext();say(fmtDay(d.getTime()));}
+/* pull down at the top of the schedule to update from KronoX */
+(()=>{const v=document.getElementById('v-next');let y0=null,pull=0;
+  v.addEventListener('touchstart',e=>{y0=v.scrollTop<=0&&SCHEDS.some(s=>s.source==='link')?e.touches[0].clientY:null;pull=0;},{passive:true});
+  v.addEventListener('touchmove',e=>{if(y0==null)return;pull=Math.max(0,e.touches[0].clientY-y0);const p=document.getElementById('ptr');if(!p)return;
+    p.style.height=Math.min(60,pull/2)+'px';p.classList.toggle('ready',pull>110);p.querySelector('em').textContent=pull>110?t('releaseRefresh'):t('pullRefresh');},{passive:true});
+  v.addEventListener('touchend',async()=>{if(y0==null)return;y0=null;const p=document.getElementById('ptr');
+    if(pull>110&&p){p.querySelector('em').textContent=t('refreshing');p.classList.add('busy');buzz();await refreshAll(false);}
+    else if(p){p.style.height='0px';}});
+})();
 function busHint(e){
   const c=eventCampus(e); if(!c||e.start<=Date.now()) return '';
   const from=c==='vas'?'esk':'vas', deps=departures(from,e.start).filter(x=>x.arr<=e.start-10*60000);
@@ -600,15 +677,36 @@ const kindName=r=>r.kind?t(KINDS[r.kind]||r.kind):'';
 function itemRow(r){
   return `<button class="item" type="button" data-k="${esc(r.key)}"><span class="${r.kind||!/\d/.test(r.id)?'':'code'}" style="min-width:70px">${esc(dn(r))}</span><span class="s">${placeLabel(r)}</span><span class="tag ${canRoute(r)?'go':''}">${canRoute(r)?t('route'):t('mapOnly')}</span></button>`;
 }
+const bigr=s=>{s=norm(s);const o=new Set();for(let i=0;i<s.length-1;i++)o.add(s.slice(i,i+2));return o;};
+const simil=(a,b)=>{const A=bigr(a),B=bigr(b);if(!A.size||!B.size)return 0;let n=0;for(const x of A)if(B.has(x))n++;return 2*n/(A.size+B.size);};
+function courseRooms(){const m=new Map();for(const e of allEvents()){if(!SCHEDS.length)break;const r=knownRoom(e);if(!r)continue;if(!m.has(e.course))m.set(e.course,new Map());m.get(e.course).set(r.key,r);}return m;}
 function renderSearch(){
   const q=document.getElementById('q');q.placeholder=t('qph');
-  const s=norm(q.value);
-  let list=ROOMS.filter(r=>!s||norm(r.id).includes(s)||norm(r.id).replace('-','').includes(s)||(r.kind&&(norm(kindName(r)).includes(s)||norm(dn(r)).includes(s))));
-  list.sort((a,b)=>(a.campus===campus?0:1)-(b.campus===campus?0:1)||a.b.localeCompare(b.b)||a.floor-b.floor||a.id.localeCompare(b.id));
+  const raw=q.value.trim(),s=norm(raw);
   const res=document.getElementById('results');
-  if(!list.length){res.innerHTML=`<p class="muted small" style="margin:6px">${t('none')}</p>`;return;}
-  res.innerHTML=list.slice(0,100).map(itemRow).join('');
-  res.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>goRoom(BYKEY.get(b.dataset.k)));
+  if(!s){
+    const rec=(store.get('mdu.recent')||[]).map(k=>BYKEY.get(k)).filter(Boolean);
+    let h='';
+    if(rec.length)h+=`<div class="eyebrow" style="margin:4px 2px">${t('recent')}</div><div class="chips">${rec.map(r=>`<button class="chip" type="button" data-k="${esc(r.key)}">${esc(dn(r))}</button>`).join('')}</div>`;
+    const list=ROOMS.filter(r=>r.campus===campus).sort((a,b)=>a.b.localeCompare(b.b)||a.floor-b.floor||a.id.localeCompare(b.id));
+    res.innerHTML=h+list.slice(0,60).map(itemRow).join('');
+  }else{
+    let list=ROOMS.filter(r=>norm(r.id).includes(s)||norm(r.id).replace('-','').includes(s)||(r.kind&&(norm(kindName(r)).includes(s)||norm(dn(r)).includes(s))));
+    list.sort((a,b)=>(a.campus===campus?0:1)-(b.campus===campus?0:1)||a.b.localeCompare(b.b)||a.floor-b.floor||a.id.localeCompare(b.id));
+    let h='';
+    // rooms used by a course you have added
+    const cr=courseRooms();let best=null,bs=0;
+    for(const [c,rooms] of cr){const sc=norm(c).includes(s)?1:simil(raw,c.slice(0,Math.max(raw.length+4,8)));if(sc>bs){bs=sc;best=[c,rooms];}}
+    if(best&&bs>=0.45&&s.length>=3){const [c,rooms]=best;
+      if(!norm(c).includes(s))h+=`<p class="small muted" style="margin:4px 2px">${t('didMean')} <b>${esc(c)}</b>?</p>`;
+      h+=`<div class="eyebrow" style="margin:4px 2px">${t('courseRooms',{c:esc(c)})}</div>${[...rooms.values()].map(itemRow).join('')}`;}
+    if(!list.length&&!h){
+      const near=ROOMS.map(r=>[r,simil(raw,r.kind?dn(r):r.id)]).filter(x=>x[1]>=0.5).sort((a,b)=>b[1]-a[1]).slice(0,5).map(x=>x[0]);
+      h+=near.length?`<p class="small muted" style="margin:4px 2px">${t('didMean')}</p>${near.map(itemRow).join('')}`:`<p class="muted small" style="margin:6px">${t('none')}</p>`;
+    }
+    res.innerHTML=h+list.slice(0,100).map(itemRow).join('');
+  }
+  res.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{const k=b.dataset.k;const L=(store.get('mdu.recent')||[]).filter(x=>x!==k);L.unshift(k);store.set('mdu.recent',L.slice(0,6));buzz();goRoom(BYKEY.get(k));});
 }
 document.getElementById('q').addEventListener('input',renderSearch);
 
@@ -617,7 +715,7 @@ function renderPlaces(){
   const el=document.getElementById('v-places');
   const o=openState();
   let h=`<div class="seg big" role="group">${['vas','esk'].map(c=>`<button type="button" data-c="${c}" aria-pressed="${c===campus}">${t(c)}</button>`).join('')}</div>
-   <div class="card"><div class="row"><span class="eyebrow" style="flex:1">${t('hoursT')}</span><span class="pill ${o.open?'ok':'off'}">${o.open?t('openNow'):t('closedNow')}</span></div>
+   <div class="card"><div class="row">${tileHtml('clock')}<span class="eyebrow" style="flex:1">${t('hoursT')}</span><span class="pill ${o.open?'ok':'off'}">${o.open?t('openNow'):t('closedNow')}</span></div>
    <p class="small" style="margin:8px 0 0">${o.open?t('openUntil',{t:o.until}):t('opensAt',{d:o.day,t:o.at})}</p>
    <table class="hours"><tr><th colspan="2">${t('hStudents')}</th></tr><tr><td>${t('hWeekdays')}</td><td class="code">05:30–22:00</td></tr><tr><td>${t('hWeekend')}</td><td class="code">06:30–22:00</td></tr>
    <tr><th colspan="2">${t('hComputer')}</th></tr><tr><td>${t('hEveryDay')}</td><td class="code">07:00–22:00</td></tr>
@@ -625,7 +723,7 @@ function renderPlaces(){
   const groups=[['entr',r=>r.kind==='entr'],['help',r=>r.kind==='help'],['food',r=>r.kind==='cafe'||r.kind==='food'],['lib',r=>r.kind==='lib'],['quiet',r=>r.kind==='quiet'],['wc',r=>r.kind==='wc'],['aed',r=>r.kind==='aed'],
     ['halls',r=>!r.kind&&/^[A-Z][a-zé]/.test(r.id)]];
   h+=groups.map(([k,f])=>{const L=ROOMS.filter(r=>r.campus===campus&&f(r));if(!L.length)return'';
-    return `<div class="card cat"><h3>${t(k)}</h3><div class="list">${L.map(itemRow).join('')}</div></div>`}).join('')+`<p class="note">${t('dataNote')}</p>`;
+    return `<div class="card cat"><h3 class="cath">${tileHtml(PLACE_TILE[k])}<span style="flex:1">${t(k)}</span><span class="cnt">${L.length}</span></h3><div class="list">${L.map(itemRow).join('')}</div></div>`}).join('')+`<p class="note">${t('dataNote')}</p>`;
   el.innerHTML=h;
   el.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{setCampus(b.dataset.c);renderPlaces();});
   el.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>goRoom(BYKEY.get(b.dataset.k)));
@@ -676,7 +774,7 @@ function renderMapBar(){
   cs.innerHTML=['vas','esk'].map(c=>`<button type="button" data-c="${c}" aria-pressed="${c===campus}">${t(c)}</button>`).join('');
   const rfl=routeFloors();
   bs.innerHTML=CAMPUS[campus].blds.map(k=>{const f=rfl.find(fk=>BUILD[k].floors.includes(fk));return `<button type="button" data-b="${k}" aria-pressed="${k===bld}" ${f?`class="has-route" style="--fc:${floorColor(f)}"`:''}>${bShort(k)}</button>`;}).join('');
-  fs.innerHTML=`<span class="seglbl">${t('floor')}</span>`+BUILD[bld].floors.map(fk=>{const c=floorColor(fk);return `<button type="button" data-f="${fk}" aria-pressed="${fk===floor}" ${c?`class="has-route" style="--fc:${c}"`:''}>${fk.slice(1)}</button>`;}).join('');
+  fs.innerHTML=`<span class="seglbl">${t('floor')}</span>`+BUILD[bld].floors.map(fk=>{const c=floorColor(fk);return `<button type="button" data-f="${fk}" aria-label="${t('floorN',{n:fk.slice(1)})}" aria-pressed="${fk===floor}" ${c?`class="has-route" style="--fc:${c}"`:''}>${fk.slice(1)}</button>`;}).join('');
   cs.querySelectorAll('button').forEach(b=>b.onclick=()=>{setCampus(b.dataset.c);renderMap();renderSheet();fitAll();});
   bs.querySelectorAll('button').forEach(b=>b.onclick=()=>{bld=b.dataset.b;floor=BUILD[bld].floors[target&&target.b===bld?target.floor-1:0];renderMap();fitAll();});
   fs.querySelectorAll('button').forEach(b=>b.onclick=()=>{floor=b.dataset.f;renderMap();renderSheet();});
@@ -692,8 +790,8 @@ function renderMap(){
       const pts=s.pts.map(p=>p.x+','+p.y).join(' ');
       el('polyline',{points:pts,fill:'none',stroke:'#ffffff',"stroke-width":8,"stroke-linecap":"round","stroke-linejoin":"round",opacity:.9},svg);
       // see-through route: a blue line blended with the map (multiply), so room numbers under it stay readable
-      el('polyline',{points:pts,fill:'none',stroke:'var(--route)',"stroke-width":5,opacity:.42,"stroke-linecap":"round","stroke-linejoin":"round",class:'routebase'},svg);
-      el('polyline',{points:pts,fill:'none',stroke:'var(--route)',"stroke-width":1.8,opacity:.85,"stroke-dasharray":"5 7","stroke-linecap":"round",class:'routeline routebase'},svg);
+      el('polyline',{points:pts,fill:'none',stroke:'var(--route)',"stroke-width":5,opacity:.28,"stroke-linecap":"round","stroke-linejoin":"round",class:'routebase'},svg);
+      el('polyline',{points:pts,fill:'none',stroke:'var(--route)',"stroke-width":1.8,opacity:.55,"stroke-dasharray":"5 7","stroke-linecap":"round",class:'routeline routebase'},svg);
     }
     for(const s of route.marks.filter(s=>s.fk===floor)){
       el('circle',{cx:s.x,cy:s.y,r:8,fill:'var(--stair)',stroke:'#fff',"stroke-width":2},svg);
@@ -724,8 +822,20 @@ function renderMap(){
   }
   applyVB();
 }
+/* Smart start: if your previous class (same campus) has just ended or is ending, the route starts from that room —
+   unless you picked a start yourself in the last 30 minutes */
+var AUTO_OK=true;
+function autoStart(){
+  if(!target||!AUTO_OK)return null;
+  if(Date.now()-(+store.get('mdu.startAt')||0)<30*60000)return null;
+  const now=Date.now();let best=null;
+  for(const e of allEvents()){if(!SCHEDS.length||e.deadline)continue;if(e.end<now-45*60000||e.end>now+20*60000||e.start>now)continue;
+    const r=knownRoom(e);if(r&&r.campus===target.campus&&r.key!==target.key&&canRoute(r)&&(!best||e.end>best.e.end))best={e,r};}
+  return best?{type:'room',key:best.r.key,auto:true}:null;
+}
 function effectiveStart(){
   if(!target) return start;
+  const a=autoStart();if(a)return a;
   const ok=s=>{if(!s)return false;if(s.type==='node'){const p=POS.get(s.id);return p&&BUILD[p.fk[0]].campus===target.campus;}const r=BYKEY.get(s.key);return r&&r.campus===target.campus&&canRoute(r);};
   if(ok(start)) return start;
   return DEFAULT_START[target.b]||DEFAULT_START[CAMPUS[target.campus].blds[0]];
@@ -777,7 +887,7 @@ function showRoute(){
   if(route&&!route.same&&route.segs.length){const s0=route.segs[0];floor=s0.fk;bld=s0.fk[0];curStep=0;renderMap();renderSheet();fitRoute();}
   else{renderMap();renderSheet();if(target)focusTarget();}
 }
-function setStart(s){start=s;store.set('mdu.start2',s);computeRoute();showRoute();}
+function setStart(s){start=s;store.set('mdu.start2',s);store.set('mdu.startAt',Date.now());computeRoute();showRoute();}
 function goRoom(r){if(!r)return;target=r;if(r.campus!==campus){campus=r.campus;store.set('mdu.campus',campus);}bld=r.b;floor=r.fk;sheetMin=false;computeRoute();if(route&&!route.same&&route.segs.length){floor=route.segs[0].fk;bld=floor[0];}setView('map');requestAnimationFrame(showRoute);}
 function selectTarget(r){target=r;sheetMin=false;computeRoute();showRoute();}
 function focusTarget(){const f=DATA[floor];const k=0.35;fitBox(target.x-f.w*k/2,target.y-f.h*k/2,target.x+f.w*k/2,target.y+f.h*k/2,0);}
@@ -837,7 +947,7 @@ function renderSheet(){
   let h=`${canMin?`<button class="grab" type="button" id="grab" aria-label="${sheetMin?t('showStepsA'):t('hideStepsA')}"></button>`:'<div class="grab"></div>'}<div class="row wrap head"><span class="dot" style="background:var(--target)"></span><h2 class="${target.kind?'':'code'}" style="flex:1">${esc(dn(target))}</h2><span class="muted small">${kind&&target.kind!=='wc'?esc(kind)+' · ':''}${placeLabel(target)}</span></div>`;
   if(!canRoute(target)){h+=`<p class="small" style="margin:10px 0 0">${t('noRoute',{p:placeLabel(target)})}</p>`;}
   else{
-    h+=`<button class="from" type="button" id="fromBtn"><span class="dot" style="background:var(--start)"></span><span style="flex:1"><span class="muted small">${t('from')}: </span>${startLabel()}</span><span class="small" style="color:var(--accent);font-weight:600">${t('change')}</span></button>`;
+    h+=`<button class="from" type="button" id="fromBtn"><span class="dot" style="background:var(--start)"></span><span style="flex:1"><span class="muted small">${t('from')}: </span>${startLabel()}${effectiveStart()&&effectiveStart().auto?` <span class="badge">${t('lastClass')}</span>`:''}</span><span class="small" style="color:var(--accent);font-weight:600">${t('change')}</span></button>`;
     if(route&&route.same) h+=`<p class="small">${t('sameSpot')}</p>`;
     else if(route){
       h+=`<button class="minbar" type="button" id="minbar">▲ ${t('showSteps',{n:route.steps.length})}</button>`;
@@ -846,11 +956,14 @@ function renderSheet(){
     }
     h+=`<div class="starthint"><button class="ghost" type="button" id="setHere">📍 ${t('setStart')}</button><span class="small muted">${t('setStartHint')}</span></div>`;
   }
+  h+=`<button class="ghost sharebtn" type="button" id="shareBtn">🔗 ${t('share')}</button>`;
   sh.innerHTML=h;sh.classList.toggle('min',!!(sheetMin&&canMin));setSheetH();wireSheet(sh,canMin);
   const fb=sh.querySelector('#fromBtn');fb&&(fb.onclick=openStartPicker);
+  sh.querySelector('#shareBtn').onclick=()=>sharePlace(target);
+  if(route&&!route.same&&sh._said!==target.key+route.mins){sh._said=target.key+route.mins;say(t('srRoute',{r:dn(target),n:route.steps.length,m:route.mins}));}
   const ind=sh.querySelector('#indoor');ind&&(ind.onchange=()=>{AVOID_OUT=ind.checked;store.set('mdu.indoor',AVOID_OUT);computeRoute();showRoute();});
   const sh2=sh.querySelector('#setHere');sh2&&(sh2.onclick=()=>{const r=target;target=null;route=null;setStart({type:'room',key:r.key});toast(t('startSet',{r:dn(r)}));});
-  sh.querySelectorAll('[data-step]').forEach(b=>b.onclick=()=>{curStep=+b.dataset.step;const s=route.steps[curStep];floor=s.fk;bld=s.fk[0];renderMap();renderSheet();fitRoute();});
+  sh.querySelectorAll('[data-step]').forEach(b=>b.onclick=()=>{buzz();curStep=+b.dataset.step;const s=route.steps[curStep];floor=s.fk;bld=s.fk[0];renderMap();renderSheet();fitRoute();});
 }
 /* Bottom sheet: drag the handle down (or tap it) to shrink it to one line and see the whole map; drag up or tap "Show steps" to open it again. */
 var sheetMin=false;
@@ -876,6 +989,11 @@ function wireSheet(sh,canMin){
 function setSheetH(){const sh=document.getElementById('sheet'),w=document.querySelector('.mapwrap');w.style.setProperty('--sheet-h',sh.offsetHeight+'px');w.style.setProperty('--bar-h',document.querySelector('.mapbar').offsetHeight+'px');}
 
 /* start picker */
+async function sharePlace(r){
+  const url=PUBLIC_URL+'?p='+encodeURIComponent(r.key),txt=t('shareText',{r:dn(r)})+' 📍';
+  try{if(navigator.share){await navigator.share({title:'MDU Navigator',text:txt,url});return;}}catch(e){if(e&&e.name==='AbortError')return;}
+  try{await navigator.clipboard.writeText(txt+' '+url);toast(t('copied'));}catch(e){prompt('',url);}
+}
 function openStartPicker(){
   const ov=document.getElementById('ov'),d=document.getElementById('dlg');const c=target?target.campus:campus;
   d.innerHTML=`<div class="row"><h3 style="flex:1">${t('pickStart')}</h3><button class="ghost" type="button" id="dx">${t('close')}</button></div>
@@ -955,3 +1073,42 @@ function renderA2HS(){
 })();
 renderInfo();
 if('serviceWorker' in navigator&&!IS_NATIVE&&(location.protocol==='https:'||location.hostname==='localhost')){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+/* ---------- shared links: ?p=<place key> or ?room=R2-142 opens the route ---------- */
+(()=>{try{const q=new URLSearchParams(location.search);const p=q.get('p'),rm=q.get('room');
+  const r=p?BYKEY.get(p):rm?BYCODE.get(norm(rm)):null;
+  if(r){store.set('mdu.onb',1);history.replaceState(null,'',location.pathname+'#map');setTimeout(()=>goRoom(r),50);}}catch(e){}})();
+/* ---------- first start: 3 short welcome screens (campus, schedule, home screen) ---------- */
+function showOnboarding(){
+  const o=document.getElementById('onb');if(!o)return;
+  const standalone=window.navigator.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);
+  const steps=IS_NATIVE||standalone?2:3;let step=1,pick=store.get('mdu.campus')||'vas';
+  const finish=()=>{store.set('mdu.onb',1);store.set('mdu.a2hs',Date.now());o.hidden=true;document.body.classList.remove('onb');renderNext();renderA2HS();};
+  const dots=()=>`<div class="odots" aria-hidden="true">${Array.from({length:steps},(_,k)=>`<i class="${k+1===step?'on':''}"></i>`).join('')}</div>`;
+  const draw=()=>{
+    let h=dots();
+    if(step===1){h+=`<h2>${t('onbHi')}</h2><p class="muted">${t('onbCampus')}</p><div class="opts" role="radiogroup">${[['vas',t('vas')],['esk',t('esk')],['both',t('both')]].map(([k,l])=>`<button type="button" role="radio" class="oopt ${pick===k?'on':''}" data-pick="${k}" aria-checked="${pick===k}">${tileHtml(k==='both'?'link':'mdu')}<span>${esc(l)}</span></button>`).join('')}</div>
+      <p class="small muted">${t('onbLang')}: <button type="button" class="ghost" id="olang">${lang==='en'?'English → Svenska':'Svenska → English'}</button></p>
+      <div class="obtns"><button class="btn" type="button" id="onext">${t('onbNext')}</button><button class="linkbtn" type="button" id="oskip">${t('skip')}</button></div>`;}
+    else if(step===2){h+=`<h2>${t('onbSched')}</h2><ol class="ohow"><li>${t('how1')}</li><li>${t('how2')}</li><li>${t('how3')}</li></ol>
+      <label class="search" for="oUrl"><input id="oUrl" type="url" inputmode="url" autocomplete="off" placeholder="${t('linkPh')}" aria-label="${t('linkPh')}"></label>
+      <div class="obtns"><button class="btn" type="button" id="oadd">${t('addLink')}</button>
+      <label class="btn sec file">${t('uploadB')}<input type="file" id="oFile" accept=".ics,text/calendar" multiple></label>
+      <button class="linkbtn" type="button" id="olater">${t('onbLater')}</button></div>`;}
+    else{const ios=A2HS.isIOS;h+=`<h2>${t('onbHome')}</h2><p class="muted">${t('onbHomeD')}</p><div class="ohome">${ios?esc(t('a2hsIos')).replace('%SHARE%',SHARE_SVG):A2HS.prompt?esc(t('a2hsAndroid')):esc(t('a2hsMenu'))}</div>
+      <div class="obtns">${!ios&&A2HS.prompt?`<button class="btn" type="button" id="oinst">${t('a2hsInstall')}</button>`:''}<button class="${!ios&&A2HS.prompt?'linkbtn':'btn'}" type="button" id="odone">${t('done')}</button></div>`;}
+    o.querySelector('.ocard').innerHTML=h;
+    const q=s=>o.querySelector(s);
+    o.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{pick=b.dataset.pick;buzz();draw();});
+    q('#olang')&&(q('#olang').onclick=()=>{lang=lang==='en'?'sv':'en';store.set('mdu.lang',lang);applyLang();draw();});
+    q('#onext')&&(q('#onext').onclick=()=>{setCampus(pick==='esk'?'esk':'vas');store.set('mdu.bothCampus',pick==='both');step=2;draw();});
+    q('#oskip')&&(q('#oskip').onclick=finish);
+    q('#olater')&&(q('#olater').onclick=()=>{if(step<steps){step++;draw();}else finish();});
+    q('#oadd')&&(q('#oadd').onclick=async()=>{const u=q('#oUrl').value.trim();if(u&&await addLink(u,false)){buzz();if(step<steps){step++;draw();}else finish();}});
+    q('#oFile')&&(q('#oFile').onchange=async()=>{let n=0;for(const file of q('#oFile').files){const ev=parseICS(await file.text());if(ev){addSchedule(ev,'file');n+=ev.length;}}toast(n?t('loaded',{n}):t('badFile'));if(n){buzz();if(step<steps){step++;draw();}else finish();}});
+    q('#oinst')&&(q('#oinst').onclick=async()=>{const p=A2HS.prompt;A2HS.prompt=null;p.prompt();try{await p.userChoice;}catch(e){}finish();});
+    q('#odone')&&(q('#odone').onclick=finish);
+    const h2=o.querySelector('h2');h2&&h2.focus&&(h2.tabIndex=-1,h2.focus());
+  };
+  o.hidden=false;document.body.classList.add('onb');draw();
+}
+if(!store.get('mdu.onb')&&!SCHEDS.length)showOnboarding();
