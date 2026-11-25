@@ -2,7 +2,7 @@
 const T = {
  en:{appTitle:'MDU Navigator',appSub:'Västerås · Eskilstuna',tNext:'Schedule',tSearch:'Search',tMap:'Map',tPlaces:'Places',tBus:'Bus',
   vas:'Västerås',esk:'Eskilstuna',
-  next:'Next session',now:'Happening now',later:'Coming up',updAgo:'Updated {t}',agoNow:'just now',agoMin:'{n} min ago',agoH:'{n} h ago',agoD:'{n} days ago',offline:'No internet. Showing your saved schedule from {t}.',syncFail:'KronoX didn’t answer. Your saved schedule is still here.',tryAgain:'Try again',noDay:'No classes this day 🎉',weekN:'Week {n}',pullRefresh:'Pull to update',releaseRefresh:'Release to update',refreshing:'Updating…',lastClass:'your last class',walkFrom:'{m} min walk from {r} · {g} min break',tight:'Tight',share:'Share',shareText:'Meet me at {r}',copied:'Link copied',recent:'Recent searches',courseRooms:'Rooms for {c}',didMean:'Did you mean',vib:'Vibrate on taps',onbHi:'Welcome to MDU Navigator',onbCampus:'Which campus do you study on?',both:'Both',onbNext:'Next',skip:'Skip',onbLater:'Later',onbSched:'Add your schedule',onbHome:'Keep it on your home screen',onbHomeD:'It opens like an app and works without internet.',done:'Done',onbLang:'Language',srRoute:'Route to {r}: {n} steps, about {m} min',floorN:'Floor {n}',prevWeek:'Previous week',nextWeek:'Next week',roomTba:'Room TBA',roomTbaLong:'No room booked yet in KronoX',progress:'How much of the session has passed',progDone:'{p}% done',laterSame:'Later the same day',goTo:'Take me to',online:'Online',deadline:'Deadline',nextDeadline:'Next deadline',
+  next:'Next session',now:'Happening now',later:'Coming up',updAgo:'Updated {t}',agoNow:'just now',agoMin:'{n} min ago',agoH:'{n} h ago',agoD:'{n} days ago',offline:'No internet. Showing your saved schedule from {t}.',syncFail:'KronoX didn’t answer. Your saved schedule is still here.',tryAgain:'Try again',noDay:'No classes this day 🎉',weekN:'Week {n}',pullRefresh:'Pull to update',releaseRefresh:'Release to update',refreshing:'Updating…',lastClass:'your last class',walkFrom:'{m} min walk from {r} · {g} min break',tight:'Tight',share:'Share',shareText:'Meet me at {r}',copied:'Link copied',recent:'Recent searches',courseRooms:'Rooms for {c}',didMean:'Did you mean',vib:'Vibrate on taps',onbHi:'Welcome to MDU Navigator',onbCampus:'Which campus do you study on?',both:'Both',onbNext:'Next',skip:'Skip',onbLater:'Later',onbSched:'Add your schedule',onbHome:'Keep it on your home screen',onbHomeD:'It opens like an app and works without internet.',done:'Done',gotIt:'Got it',onbLaterHint:'You can do this later from the Student tab.',onbLang:'Language',srRoute:'Route to {r}: {n} steps, about {m} min',floorN:'Floor {n}',prevWeek:'Previous week',nextWeek:'Next week',roomTba:'Room TBA',roomTbaLong:'No room booked yet in KronoX',progress:'How much of the session has passed',progDone:'{p}% done',laterSame:'Later the same day',goTo:'Take me to',online:'Online',deadline:'Deadline',nextDeadline:'Next deadline',
   notMapped:'This room isn’t on the map yet',example:'Example',yours:'Your schedule',
   myCourses:'My courses',addCourse:'Add a course',addHint:'Add each course you take. You can add as many as you like.',
   linkPh:'Paste a KronoX schedule link',addLink:'Add link',orFile:'or',uploadB:'Upload .ics files from KronoX',
@@ -47,7 +47,7 @@ const T = {
  },
  sv:{appTitle:'MDU Navigator',appSub:'Västerås · Eskilstuna',tNext:'Schema',tSearch:'Sök',tMap:'Karta',tPlaces:'Platser',tBus:'Buss',
   vas:'Västerås',esk:'Eskilstuna',
-  next:'Nästa pass',now:'Pågår nu',later:'Kommande',updAgo:'Uppdaterat {t}',agoNow:'nyss',agoMin:'för {n} min sedan',agoH:'för {n} h sedan',agoD:'för {n} dagar sedan',offline:'Inget internet. Visar ditt sparade schema från {t}.',syncFail:'KronoX svarade inte. Ditt sparade schema finns kvar.',tryAgain:'Försök igen',noDay:'Inga pass den här dagen 🎉',weekN:'Vecka {n}',pullRefresh:'Dra för att uppdatera',releaseRefresh:'Släpp för att uppdatera',refreshing:'Uppdaterar…',lastClass:'ditt förra pass',walkFrom:'{m} min promenad från {r} · {g} min rast',tight:'Tajt',share:'Dela',shareText:'Vi ses vid {r}',copied:'Länken kopierad',recent:'Senaste sökningar',courseRooms:'Salar för {c}',didMean:'Menade du',vib:'Vibrera vid tryck',onbHi:'Välkommen till MDU Navigator',onbCampus:'Vilket campus studerar du på?',both:'Båda',onbNext:'Nästa',skip:'Hoppa över',onbLater:'Senare',onbSched:'Lägg till ditt schema',onbHome:'Ha den på hemskärmen',onbHomeD:'Den öppnas som en app och fungerar utan internet.',done:'Klar',onbLang:'Språk',srRoute:'Väg till {r}: {n} steg, cirka {m} min',floorN:'Plan {n}',prevWeek:'Förra veckan',nextWeek:'Nästa vecka',roomTba:'Sal ej klar',roomTbaLong:'Ingen sal bokad i KronoX än',progress:'Hur mycket av passet som har gått',progDone:'{p} % klart',laterSame:'Senare samma dag',goTo:'Visa vägen till',online:'Online',deadline:'Inlämning',nextDeadline:'Nästa inlämning',
+  next:'Nästa pass',now:'Pågår nu',later:'Kommande',updAgo:'Uppdaterat {t}',agoNow:'nyss',agoMin:'för {n} min sedan',agoH:'för {n} h sedan',agoD:'för {n} dagar sedan',offline:'Inget internet. Visar ditt sparade schema från {t}.',syncFail:'KronoX svarade inte. Ditt sparade schema finns kvar.',tryAgain:'Försök igen',noDay:'Inga pass den här dagen 🎉',weekN:'Vecka {n}',pullRefresh:'Dra för att uppdatera',releaseRefresh:'Släpp för att uppdatera',refreshing:'Uppdaterar…',lastClass:'ditt förra pass',walkFrom:'{m} min promenad från {r} · {g} min rast',tight:'Tajt',share:'Dela',shareText:'Vi ses vid {r}',copied:'Länken kopierad',recent:'Senaste sökningar',courseRooms:'Salar för {c}',didMean:'Menade du',vib:'Vibrera vid tryck',onbHi:'Välkommen till MDU Navigator',onbCampus:'Vilket campus studerar du på?',both:'Båda',onbNext:'Nästa',skip:'Hoppa över',onbLater:'Senare',onbSched:'Lägg till ditt schema',onbHome:'Ha den på hemskärmen',onbHomeD:'Den öppnas som en app och fungerar utan internet.',done:'Klar',gotIt:'Uppfattat',onbLaterHint:'Du kan göra det senare under fliken Student.',onbLang:'Språk',srRoute:'Väg till {r}: {n} steg, cirka {m} min',floorN:'Plan {n}',prevWeek:'Förra veckan',nextWeek:'Nästa vecka',roomTba:'Sal ej klar',roomTbaLong:'Ingen sal bokad i KronoX än',progress:'Hur mycket av passet som har gått',progDone:'{p} % klart',laterSame:'Senare samma dag',goTo:'Visa vägen till',online:'Online',deadline:'Inlämning',nextDeadline:'Nästa inlämning',
   notMapped:'Salen finns inte på kartan än',example:'Exempel',yours:'Ditt schema',
   myCourses:'Mina kurser',addCourse:'Lägg till en kurs',addHint:'Lägg till varje kurs du läser. Du kan lägga till hur många du vill.',
   linkPh:'Klistra in en schemalänk från KronoX',addLink:'Lägg till länk',orFile:'eller',uploadB:'Ladda upp .ics-filer från KronoX',
@@ -548,7 +548,7 @@ function locBlock(e){
 }
 function evRow(e,i){
   const L=parseLoc(e.location),r=L.rooms[0];
-  const tag=e.deadline?`<span class="tag dl">${t('deadline')}</span>`:L.type==='online'?`<span class="tag">💻 ${esc(L.label)}</span>`:L.type==='tba'?`<span class="tag">⏳ ${t('roomTba')}</span>`:r?(r.unknown?`<span class="tag">${roomCode(r)}</span>`:`<span class="tag go">${roomCode(r)}</span><span class="gopill">${t('goTo')} ›</span>`):'';
+  const tag=e.deadline?`<span class="tag dl">${t('deadline')}</span>`:L.type==='online'?`<span class="tag">💻 ${esc(L.label)}</span>`:L.type==='tba'?`<span class="tag">⏳ ${t('roomTba')}</span>`:r?(r.unknown?`<span class="tag">${roomCode(r)}</span>`:`<span class="tag go cc">${roomCode(r)}</span><span class="gopill">${t('goTo')} ›</span>`):'';
   return `<button class="item ev" type="button" data-ev="${i}" style="--cc:${COLORS[e.color%COLORS.length]}"><span class="evtime"><b>${fmtTime(e.start)}</b>${e.deadline?'':`<span>${fmtTime(e.end)}</span>`}</span><span class="evbody"><span class="t">${esc(e.moment||e.course)}</span>${e.moment?`<span class="s">${esc(e.course)}</span>`:''}${tag?`<span class="evtag">${tag}</span>`:''}</span></button>`;
 }
 /* minutes to walk between two rooms (uses the normal route search, without touching what is on screen) */
@@ -578,12 +578,12 @@ function heroCard(e,i,now,prevSess){
 }
 function weekStrip(evs,today,sel){
   const d=new Date(sel+'T12:00:00'),wd=(d.getDay()+6)%7,mon=new Date(d);mon.setDate(d.getDate()-wd);
-  const has=new Set(evs.filter(e=>!e.deadline).map(e=>dayKey(e.start)));
+  const cols=new Map();for(const e of evs){if(e.deadline)continue;const k=dayKey(e.start);if(!cols.has(k))cols.set(k,[]);const L=cols.get(k);if(!L.includes(e.color))L.push(e.color);}
   let h=`<div class="week" role="group" aria-label="${t('weekN',{n:isoWeek(d)})}"><div class="wkhead"><button class="ghost wnav" type="button" data-wk="-7" aria-label="${t('prevWeek')}">‹</button><span>${t('weekN',{n:isoWeek(d)})}</span><button class="ghost wnav" type="button" data-wk="7" aria-label="${t('nextWeek')}">›</button></div><div class="wkdays">`;
   for(let k=0;k<7;k++){const x=new Date(mon);x.setDate(mon.getDate()+k);const key=dayKey(x.getTime());
     const n=evs.filter(e=>!e.deadline&&dayKey(e.start)===key).length;
     const lab=new Intl.DateTimeFormat(loc(),{weekday:'short'}).format(x).replace('.','');
-    h+=`<button type="button" class="wd ${key===sel?'on':''} ${key===today?'today':''}" data-day="${key}" aria-pressed="${key===sel}" aria-label="${esc(fmtDay(x.getTime()))}, ${t('sessions',{n})}"><span>${esc(lab)}</span><b>${x.getDate()}</b><i class="${has.has(key)?'has':''}"></i></button>`;}
+    h+=`<button type="button" class="wd ${key===sel?'on':''} ${key===today?'today':''}" data-day="${key}" aria-pressed="${key===sel}" aria-label="${esc(fmtDay(x.getTime()))}, ${t('sessions',{n})}"><span>${esc(lab)}</span><b>${x.getDate()}</b><span class="wdots">${(cols.get(key)||[]).slice(0,3).map(c=>`<i style="background:${COLORS[c%COLORS.length]}"></i>`).join('')}</span></button>`;}
   return h+`</div></div>`;
 }
 var EVL=[];
@@ -1085,7 +1085,7 @@ function showOnboarding(){
   const finish=()=>{store.set('mdu.onb',1);store.set('mdu.a2hs',Date.now());o.hidden=true;document.body.classList.remove('onb');renderNext();renderA2HS();};
   const dots=()=>`<div class="odots" aria-hidden="true">${Array.from({length:steps},(_,k)=>`<i class="${k+1===step?'on':''}"></i>`).join('')}</div>`;
   const draw=()=>{
-    let h=dots();
+    let h=`<div class="otop">${dots()}<button class="ghost oclose" type="button" id="oclose" aria-label="${t('close')}">✕</button></div>`;
     if(step===1){h+=`<h2>${t('onbHi')}</h2><p class="muted">${t('onbCampus')}</p><div class="opts" role="radiogroup">${[['vas',t('vas')],['esk',t('esk')],['both',t('both')]].map(([k,l])=>`<button type="button" role="radio" class="oopt ${pick===k?'on':''}" data-pick="${k}" aria-checked="${pick===k}">${tileHtml(k==='both'?'link':'mdu')}<span>${esc(l)}</span></button>`).join('')}</div>
       <p class="small muted">${t('onbLang')}: <button type="button" class="ghost" id="olang">${lang==='en'?'English → Svenska':'Svenska → English'}</button></p>
       <div class="obtns"><button class="btn" type="button" id="onext">${t('onbNext')}</button><button class="linkbtn" type="button" id="oskip">${t('skip')}</button></div>`;}
@@ -1095,7 +1095,8 @@ function showOnboarding(){
       <label class="btn sec file">${t('uploadB')}<input type="file" id="oFile" accept=".ics,text/calendar" multiple></label>
       <button class="linkbtn" type="button" id="olater">${t('onbLater')}</button></div>`;}
     else{const ios=A2HS.isIOS;h+=`<h2>${t('onbHome')}</h2><p class="muted">${t('onbHomeD')}</p><div class="ohome">${ios?esc(t('a2hsIos')).replace('%SHARE%',SHARE_SVG):A2HS.prompt?esc(t('a2hsAndroid')):esc(t('a2hsMenu'))}</div>
-      <div class="obtns">${!ios&&A2HS.prompt?`<button class="btn" type="button" id="oinst">${t('a2hsInstall')}</button>`:''}<button class="${!ios&&A2HS.prompt?'linkbtn':'btn'}" type="button" id="odone">${t('done')}</button></div>`;}
+      <div class="obtns">${!ios&&A2HS.prompt?`<button class="btn" type="button" id="oinst">${t('a2hsInstall')}</button>`:`<button class="btn" type="button" id="odone">${t('gotIt')}</button>`}<button class="linkbtn" type="button" id="onot">${t('a2hsClose')}</button></div>
+      <p class="small muted" style="text-align:center">${t('onbLaterHint')}</p>`;}
     o.querySelector('.ocard').innerHTML=h;
     const q=s=>o.querySelector(s);
     o.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{pick=b.dataset.pick;buzz();draw();});
@@ -1106,7 +1107,7 @@ function showOnboarding(){
     q('#oadd')&&(q('#oadd').onclick=async()=>{const u=q('#oUrl').value.trim();if(u&&await addLink(u,false)){buzz();if(step<steps){step++;draw();}else finish();}});
     q('#oFile')&&(q('#oFile').onchange=async()=>{let n=0;for(const file of q('#oFile').files){const ev=parseICS(await file.text());if(ev){addSchedule(ev,'file');n+=ev.length;}}toast(n?t('loaded',{n}):t('badFile'));if(n){buzz();if(step<steps){step++;draw();}else finish();}});
     q('#oinst')&&(q('#oinst').onclick=async()=>{const p=A2HS.prompt;A2HS.prompt=null;p.prompt();try{await p.userChoice;}catch(e){}finish();});
-    q('#odone')&&(q('#odone').onclick=finish);
+    q('#odone')&&(q('#odone').onclick=finish);q('#onot')&&(q('#onot').onclick=finish);q('#oclose').onclick=finish;
     const h2=o.querySelector('h2');h2&&h2.focus&&(h2.tabIndex=-1,h2.focus());
   };
   o.hidden=false;document.body.classList.add('onb');draw();

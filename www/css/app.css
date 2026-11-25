@@ -314,3 +314,12 @@ body.onb nav{visibility:hidden}
 details > summary{min-height:44px}
 .chk{min-height:44px}
 .ocard h2:focus{outline:none}
+/* course colours: week dots and room tags */
+.wdots{display:flex;gap:2px;height:5px;justify-content:center}
+.wdots i{width:5px;height:5px;border-radius:5px;display:block}
+.wd.on .wdots i{box-shadow:0 0 0 1.5px #fff}
+.item.ev .tag.go.cc{background:color-mix(in srgb,var(--cc) 14%,transparent);color:color-mix(in srgb,var(--cc) 82%,#000)}
+:root[data-theme="dark"] .item.ev .tag.go.cc{color:color-mix(in srgb,var(--cc) 70%,#fff)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .item.ev .tag.go.cc{color:color-mix(in srgb,var(--cc) 70%,#fff)}}
+.otop{display:flex;align-items:center;justify-content:center;position:relative;min-height:36px}
+.oclose{position:absolute;inset-inline-end:0;top:0;width:36px;height:36px;padding:0;font-size:16px}
