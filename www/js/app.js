@@ -609,7 +609,7 @@ function renderNext(){
       featured=sessions.filter(x=>dayKey(x.start)===d0||x.start<=now);
       featured.forEach((e,i)=>{const prev=[...all].filter(x=>!x.deadline&&x.end<=e.start&&dayKey(x.start)===dayKey(e.start)).pop();h+=heroCard(e,i,now,prev);});
     }
-    if(nextDl) h+=`<div class="card deadline row">${dot(nextDl.color)}<span style="flex:1"><span class="eyebrow">${t('nextDeadline')}</span><br><b>${esc(nextDl.moment||nextDl.course)}</b><br><span class="muted small">${esc(nextDl.course)}</span></span><span class="small" style="text-align:end"><b>${fmtDay(nextDl.start)}</b><br><span class="code">${fmtTime(nextDl.start)}</span></span></div>`;
+    if(nextDl) h+=`<div class="card deadline row" style="border-left-color:${COLORS[nextDl.color%COLORS.length]}">${dot(nextDl.color)}<span style="flex:1"><span class="eyebrow">${t('nextDeadline')}</span><br><b>${esc(nextDl.moment||nextDl.course)}</b><br><span class="muted small">${esc(nextDl.course)}</span></span><span class="small" style="text-align:end"><b>${fmtDay(nextDl.start)}</b><br><span class="code">${fmtTime(nextDl.start)}</span></span></div>`;
   }else{
     const dl=all.filter(e=>dayKey(e.start)===sel);
     h+=`<div class="eyebrow">${fmtDay(new Date(sel+'T12:00:00').getTime())}</div>`;
@@ -665,6 +665,8 @@ function shiftDay(n){const d=new Date((selDay||dayKey(Date.now()))+'T12:00:00');
     else if(p){p.style.height='0px';}});
 })();
 function busHint(e){
+  // only for sessions in a real room on campus (not Zoom, Canvas or a room that isn't booked yet)
+  if(!knownRoom(e)) return '';
   const c=eventCampus(e); if(!c||e.start<=Date.now()) return '';
   const from=c==='vas'?'esk':'vas', deps=departures(from,e.start).filter(x=>x.arr<=e.start-10*60000);
   const v={s:esc(e.moment||e.course),t:fmtTime(e.start),c:t(c),from:t(from)};
