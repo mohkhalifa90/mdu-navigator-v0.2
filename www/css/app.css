@@ -323,3 +323,9 @@ details > summary{min-height:44px}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .item.ev .tag.go.cc{color:color-mix(in srgb,var(--cc) 70%,#fff)}}
 .otop{display:flex;align-items:center;justify-content:center;position:relative;min-height:36px}
 .oclose{position:absolute;inset-inline-end:0;top:0;width:36px;height:36px;padding:0;font-size:16px}
+/* bus tab photo */
+.bushero{position:relative;margin:0;flex-shrink:0;border-radius:16px;overflow:hidden;aspect-ratio:840/472;background:#dfe7f2}
+.bushero img{width:100%;height:100%;object-fit:cover;display:block}
+.bushero figcaption{position:absolute;inset:auto 0 0 0;padding:28px 12px 9px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.5));color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.6);display:flex;flex-direction:column;align-items:flex-end;text-align:end;line-height:1.2}
+.bushero figcaption b{font-size:17px}
+.bushero figcaption span{font-size:12.5px;opacity:.92}

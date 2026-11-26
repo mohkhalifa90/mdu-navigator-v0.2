@@ -37,7 +37,7 @@ const T = {
   hoursT:'Opening hours',openNow:'Open for students now',closedNow:'Closed for students now',openUntil:'until {t}',opensAt:'opens {d} {t}',
   hStudents:'Students (MDU card + PIN)',hWeekdays:'Mon–Fri',hWeekend:'Weekends & holidays',hComputer:'Computer rooms',hEveryDay:'every day',hPublic:'Public',hMonThu:'Mon–Thu',hFri:'Fri',
   /* bus */
-  busT:'MDU bus',busFrom:'From {c}',busNext:'Next bus',busArr:'arrives {t}',busNone:'No more buses today',busNoService:'No bus today',busNextDay:'Next: {d} {t}',
+  busT:'MDU bus',busImgAlt:'The blue MDU double-decker bus at Campus Eskilstuna',busFrom:'From {c}',busNext:'Next bus',busArr:'arrives {t}',busNone:'No more buses today',busNoService:'No bus today',busNextDay:'Next: {d} {t}',
   busToday:'Today’s departures',busStop:'Bus stop',openMap:'Open in Maps',
   busStopVas:'Vasagatan, just after the Solbergagatan junction, level with Arosvallen',busStopEsk:'Rademachergatan 26',
   busRules:'Free for MDU students, Monday–Friday during the academic year. Show your MDU card with your photo to the driver. No buses on public holidays. Wi‑Fi on board. Folding bikes are fine, e-bikes and e-scooters are not allowed.',
@@ -80,7 +80,7 @@ const T = {
   updated:'Uppdaterat {t}',otherLang:'English',
   hoursT:'Öppettider',openNow:'Öppet för studenter nu',closedNow:'Stängt för studenter nu',openUntil:'till {t}',opensAt:'öppnar {d} {t}',
   hStudents:'Studenter (MDU-kort + PIN)',hWeekdays:'Mån–fre',hWeekend:'Helger',hComputer:'Datorsalar',hEveryDay:'alla dagar',hPublic:'Allmänheten',hMonThu:'Mån–tor',hFri:'Fre',
-  busT:'MDU-bussen',busFrom:'Från {c}',busNext:'Nästa buss',busArr:'framme {t}',busNone:'Inga fler bussar idag',busNoService:'Ingen buss idag',busNextDay:'Nästa: {d} {t}',
+  busT:'MDU-bussen',busImgAlt:'Den blå MDU-bussen, en dubbeldäckare, vid campus Eskilstuna',busFrom:'Från {c}',busNext:'Nästa buss',busArr:'framme {t}',busNone:'Inga fler bussar idag',busNoService:'Ingen buss idag',busNextDay:'Nästa: {d} {t}',
   busToday:'Dagens avgångar',busStop:'Hållplats',openMap:'Öppna i Kartor',
   busStopVas:'Vasagatan, strax efter korsningen med Solbergagatan, i höjd med Arosvallen',busStopEsk:'Rademachergatan 26',
   busRules:'Gratis för MDU-studenter måndag–fredag under läsåret. Visa ditt MDU-kort med foto för chauffören. Ingen trafik på helgdagar. Wi‑Fi ombord. Hopfällbara cyklar går bra, elcyklar och elsparkcyklar är inte tillåtna.',
@@ -741,7 +741,8 @@ function renderBus(){
   if(nb&&dayKey(new Date(nb.dep))===dayKey(new Date())) big=`<div class="busbig"><span class="code">${fmtTime(nb.dep)}</span><span class="muted">→ ${t(to)} · ${t('busArr',{t:fmtTime(nb.arr)})}</span></div><div class="pill">${t('inX')} ${fmtRel(nb.dep)}</div>`;
   else big=`<div class="busbig"><span class="small">${off?`${t('busNoService')} · ${t({weekend:'weekend',holiday:'holiday',term:'termOff'}[off])}`:t('busNone')}</span></div>${nb?`<div class="pill">${t('busNextDay',{d:fmtDay(nb.dep),t:fmtTime(nb.dep)})}</div>`:''}`;
   const stopTxt=t(busFrom==='vas'?'busStopVas':'busStopEsk');
-  el.innerHTML=`<div class="seg big" role="group">${['vas','esk'].map(c=>`<button type="button" data-f="${c}" aria-pressed="${c===busFrom}">${t('busFrom',{c:t(c)})}</button>`).join('')}</div>
+  el.innerHTML=`<figure class="bushero"><img src="img/mdu-bus.jpg" alt="${esc(t('busImgAlt'))}" loading="lazy"><figcaption><b>${t('busT')}</b><span>Västerås ⇄ Eskilstuna</span></figcaption></figure>
+   <div class="seg big" role="group">${['vas','esk'].map(c=>`<button type="button" data-f="${c}" aria-pressed="${c===busFrom}">${t('busFrom',{c:t(c)})}</button>`).join('')}</div>
    <div class="card"><div class="eyebrow">${t('busNext')}</div>${big}</div>
    <div class="card"><div class="eyebrow">${t('busStop')}</div><p style="margin:6px 0 10px">${esc(stopTxt)}</p>
      <a class="btn sec" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(STOP[busFrom].q)}" target="_blank" rel="noopener">${t('openMap')}</a></div>
