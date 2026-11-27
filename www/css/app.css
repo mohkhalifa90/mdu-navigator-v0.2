@@ -333,3 +333,12 @@ details > summary{min-height:44px}
 .turns{display:flex;flex-direction:column;gap:3px;margin-top:6px}
 .turns .tn{display:grid;grid-template-columns:18px 1fr;gap:6px;align-items:start;color:var(--ink);font-size:13px;line-height:1.35}
 .turns .ti{font-weight:700;color:#0a7d2c;text-align:center}
+.steps li{position:relative}
+.steps li.hasT{min-height:58px}
+.steps .tgl{all:unset;position:absolute;left:8px;top:35px;width:24px;height:20px;display:grid;place-items:center;cursor:pointer;color:#0a7d2c;border-radius:6px}
+.steps .tgl::before{content:'';position:absolute;inset:-10px -8px}
+.steps .tgl svg{transition:transform .2s}
+.steps .tgl.open svg{transform:rotate(180deg)}
+.steps .tgl:focus-visible{outline:2px solid #0a7d2c}
+.steps .turnsw{grid-column:2}
+.steps .turnsw .turns{margin-top:2px}
