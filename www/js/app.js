@@ -20,7 +20,7 @@ const T = {
   setStart:'Set as my starting point',setStartHint:'New routes will start from this room instead of the entrance.',startSet:'Routes now start from {r}',indoorOnly:'Stay indoors',
   outStep:'Walk outside from “{from}” to “{to}” (about 1 min)',cancel:'Cancel',close:'Close',sameSpot:'You’re already there.',
   wc:'Toilets',food:'Food & café',quiet:'Quiet spaces',help:'Help & service',aed:'Defibrillators',halls:'Named halls',lib:'Library',entr:'Entrances',
-  stairsBy:'the stairs by {r}',stSpiral:'the spiral stairs in the middle',stUA:'the north-west stairs',stUB:'the west stairs (middle)',stUC:'the south-west stairs',stUE:'the east stairs',
+  stairsBy:'the stairs by {r}',stSpiral:'the spiral stairs in the middle',stUA:'the north-west stairs',stUB:'the west stairs (middle)',stUC:'the south-west stairs',stUE:'the east stairs',stUT:'the stairs in front of the library (by U2-273)',stUL:'the stairs inside the University Library',stUTB:'the stairs inside T Block (north-west corner)',
   stEW:'the Västra länken stairwell',stEE:'the Östra länken stairwell',stEC:'the lifts by Studenttorget',stES:'the lift by the C building',
   ent_rw:'R Block main entrance (floor 1)',ent_rn:'R Block entrance by R1-121',ent_re:'R Block entrance by R1-452',ent_rs:'R Block entrance by R1-152',
   ent_uw:'U Block entrance (floor 1)',ent_un:'Entrance between T and U (north side)',ent_us:'Entrance between T and U (south side)',
@@ -65,7 +65,7 @@ const T = {
   setStart:'Använd som startpunkt',setStartHint:'Nya vägar börjar från den här salen i stället för entrén.',startSet:'Vägarna börjar nu från {r}',indoorOnly:'Gå inomhus',
   outStep:'Gå utomhus från ”{from}” till ”{to}” (cirka 1 min)',cancel:'Avbryt',close:'Stäng',sameSpot:'Du är redan där.',
   wc:'Toaletter',food:'Mat och café',quiet:'Lugna platser',help:'Hjälp och service',aed:'Hjärtstartare',halls:'Salar med namn',lib:'Bibliotek',entr:'Entréer',
-  stairsBy:'trappan vid {r}',stSpiral:'spiraltrappan i mitten',stUA:'trappan i nordväst',stUB:'västra trappan (mitten)',stUC:'trappan i sydväst',stUE:'östra trappan',
+  stairsBy:'trappan vid {r}',stSpiral:'spiraltrappan i mitten',stUA:'trappan i nordväst',stUB:'västra trappan (mitten)',stUC:'trappan i sydväst',stUE:'östra trappan',stUT:'trappan framför biblioteket (vid U2-273)',stUL:'trappan inne i Universitetsbiblioteket',stUTB:'trappan inne i hus T (nordvästra hörnet)',
   stEW:'trapphuset Västra länken',stEE:'trapphuset Östra länken',stEC:'hissarna vid Studenttorget',stES:'hissen vid C-huset',
   ent_rw:'Hus R huvudentré (plan 1)',ent_rn:'Hus R entré vid R1-121',ent_re:'Hus R entré vid R1-452',ent_rs:'Hus R entré vid R1-152',
   ent_uw:'Hus U entré (plan 1)',ent_un:'Entrén mellan T och U (norra sidan)',ent_us:'Entrén mellan T och U (södra sidan)',
@@ -140,6 +140,8 @@ const ROUTABLE=new Set(Object.keys(EDGES).map(k=>k[0]));
 function vlink(floors,ids,w=32){for(const id of ids)for(let i=0;i+1<floors.length;i++){const a=floors[i]+':'+id,b=floors[i+1]+':'+id;if(POS.has(a)&&POS.has(b))addEdge(a,b,w);}}
 vlink(['R1','R2','R3'],['stN','stC','stS']);
 vlink(['U1','U2','U3'],['stA','stB','stC','stE']);
+vlink(['U1','U2'],['stT']); // stairs by U2-273 in front of the library: floor 1 -> floor 2 only (comes out by the Zeta corridor)
+vlink(['U1','U2','U3'],['stTB']); // T Block's own stairwell (north-west corner) — the only way to T Block floor 3
 vlink(['E1','E2','E3','E4'],['stW','stE','stC','stS']);
 addEdge('U2:linkR','R3:ent_u',45); TRANS.set('U2:linkR|R3:ent_u','link');TRANS.set('R3:ent_u|U2:linkR','link');
 /* outdoor shortcut on the ground floor: R Block entrance by R1-121 <-> entrance between T and U (south side) */
@@ -181,7 +183,7 @@ const STAIR_REF={R1:{stN:'R1-302',stS:'R1-502'},R2:{stN:'R2-302',stS:'R2-502'},R
 function stairName(fk,id){
   const ref=(STAIR_REF[fk]||{})[id]; if(ref) return t('stairsBy',{r:`<span class="code">${esc(ref)}</span>`});
   if(fk[0]==='R'&&id==='stC') return t('stSpiral');
-  if(fk[0]==='U') return t({stA:'stUA',stB:'stUB',stC:'stUC',stE:'stUE'}[id]||'stUB');
+  if(fk[0]==='U') return t({stA:'stUA',stB:'stUB',stC:'stUC',stE:'stUE',stT:'stUT',stL:'stUL',stTB:'stUTB'}[id]||'stUB');
   if(fk[0]==='E') return t({stW:'stEW',stE:'stEE',stC:'stEC',stS:'stES'}[id]||'stEC');
   return id;
 }
