@@ -155,13 +155,23 @@ function canRoute(r){return r&&!r.unknown&&!r.noroute&&!!EDGES[r.fk];}
 function attach(r){
   if(!canRoute(r)) return null;
   if(ATT.has(r.key)) return ATT.get(r.key);
-  const id='room:'+r.key; addNode(id,r.fk,r.x,r.y);
+  // dp = the room's door opening (pre-computed from the floor plan): the route walks the corridor and turns in
+  // through the door, instead of cutting through a wall straight to the room label
+  // dpath = walking path from the corridor through the room's door to the label (pre-computed from the plan)
+  const DP=r.dpath&&r.dpath.length>1?r.dpath:null;
+  const P=DP?{x:DP[0][0],y:DP[0][1]}:r.dp?{x:r.dp[0],y:r.dp[1]}:r;
+  const id='room:'+r.key; addNode(id,r.fk,DP?r.x:P.x,DP?r.y:P.y);
   if(r.door){addEdge(id,r.fk+':'+r.door);}
   else{
     let best=null;
-    for(const [a,b] of EDGES[r.fk]){const q=project(r,POS.get(a),POS.get(b));const d=dist(q,r);if(!best||d<best.d)best={d,q,a,b};}
+    const isSt=k=>/^st/.test(k.split(':')[1]);
+    let cand=EDGES[r.fk].filter(([a,b])=>!isSt(a)&&!isSt(b)); if(!cand.length) cand=EDGES[r.fk];
+    for(const [a,b] of cand){const q=project(P,POS.get(a),POS.get(b));const d=dist(q,P);if(!best||d<best.d)best={d,q,a,b};}
     const pid='proj:'+r.key; addNode(pid,r.fk,best.q.x,best.q.y);
-    addEdge(pid,best.a);addEdge(pid,best.b);addEdge(id,pid);
+    addEdge(pid,best.a);addEdge(pid,best.b);
+    let prev=pid;
+    if(DP){for(let i=1;i<DP.length-1;i++){const nid='dp:'+r.key+':'+i;addNode(nid,r.fk,DP[i][0],DP[i][1]);addEdge(prev,nid);prev=nid;}}
+    addEdge(id,prev);
   }
   ATT.set(r.key,id);return id;
 }
