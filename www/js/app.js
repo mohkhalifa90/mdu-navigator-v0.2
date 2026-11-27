@@ -1,6 +1,6 @@
 /* ---------- i18n: English and Swedish ---------- */
 const T = {
- en:{appTitle:'MDU Navigator',appSub:'Västerås · Eskilstuna',tNext:'Schedule',tSearch:'Search',tMap:'Map',tPlaces:'Places',tBus:'Bus',
+ en:{noteMgmt:'Division of Management Support takes two floors of T Block (floors 2 and 3). On floor 3: take the stairs in front of the library up; at the landing the sign points right to Ledningsstöd.',noteMgmt2:'Division of Management Support takes floors 2 and 3 of T Block. On floor 2 it is behind the glass door by Zeta, then a card-only door for staff.',office:'Office',noteStaffCard:'Entrance by Zeta: through the glass door into the small corridor (T2-050, Zeta), then a card-only door for staff at the end.',noteT1022:'On floor 1 in the corridor in front of the library, towards the stairs (position approximate).',appTitle:'MDU Navigator',appSub:'Västerås · Eskilstuna',tNext:'Schedule',tSearch:'Search',tMap:'Map',tPlaces:'Places',tBus:'Bus',
   vas:'Västerås',esk:'Eskilstuna',
   next:'Next session',now:'Happening now',later:'Coming up',updAgo:'Updated {t}',agoNow:'just now',agoMin:'{n} min ago',agoH:'{n} h ago',agoD:'{n} days ago',offline:'No internet. Showing your saved schedule from {t}.',syncFail:'KronoX didn’t answer. Your saved schedule is still here.',tryAgain:'Try again',noDay:'No classes this day 🎉',weekN:'Week {n}',pullRefresh:'Pull to update',releaseRefresh:'Release to update',refreshing:'Updating…',lastClass:'your last class',walkFrom:'{m} min walk from {r} · {g} min break',tight:'Tight',share:'Share',shareText:'Meet me at {r}',copied:'Link copied',recent:'Recent searches',courseRooms:'Rooms for {c}',didMean:'Did you mean',vib:'Vibrate on taps',onbHi:'Welcome to MDU Navigator',onbCampus:'Which campus do you study on?',both:'Both',onbNext:'Next',skip:'Skip',onbLater:'Later',onbSched:'Add your schedule',onbHome:'Keep it on your home screen',onbHomeD:'It opens like an app and works without internet.',done:'Done',gotIt:'Got it',onbLaterHint:'You can do this later from the Student tab.',onbLang:'Language',srRoute:'Route to {r}: {n} steps, about {m} min',floorN:'Floor {n}',prevWeek:'Previous week',nextWeek:'Next week',roomTba:'Room TBA',roomTbaLong:'No room booked yet in KronoX',progress:'How much of the session has passed',progDone:'{p}% done',laterSame:'Later the same day',goTo:'Take me to',online:'Online',deadline:'Deadline',nextDeadline:'Next deadline',
   notMapped:'This room isn’t on the map yet',example:'Example',yours:'Your schedule',
@@ -45,7 +45,7 @@ const T = {
   busForNone:'Coming from {from}? No MDU bus that day gets you to {c} in time.',
   termOff:'Outside the semester',holiday:'Public holiday',weekend:'Weekend'
  },
- sv:{appTitle:'MDU Navigator',appSub:'Västerås · Eskilstuna',tNext:'Schema',tSearch:'Sök',tMap:'Karta',tPlaces:'Platser',tBus:'Buss',
+ sv:{noteMgmt:'Ledningsstöd har två plan i Hus T (plan 2 och 3). Plan 3: ta trappan framför biblioteket upp; vid trapplanet pekar skylten åt höger till Ledningsstöd.',noteMgmt2:'Ledningsstöd har plan 2 och 3 i Hus T. På plan 2 ligger det bakom glasdörren vid Zeta, sedan en kortdörr för personal.',office:'Kontor',noteStaffCard:'Ingång vid Zeta: genom glasdörren in i den lilla korridoren (T2-050, Zeta), sedan en kortdörr för personal längst in.',noteT1022:'På plan 1 i korridoren framför biblioteket, mot trappan (ungefärlig position).',appTitle:'MDU Navigator',appSub:'Västerås · Eskilstuna',tNext:'Schema',tSearch:'Sök',tMap:'Karta',tPlaces:'Platser',tBus:'Buss',
   vas:'Västerås',esk:'Eskilstuna',
   next:'Nästa pass',now:'Pågår nu',later:'Kommande',updAgo:'Uppdaterat {t}',agoNow:'nyss',agoMin:'för {n} min sedan',agoH:'för {n} h sedan',agoD:'för {n} dagar sedan',offline:'Inget internet. Visar ditt sparade schema från {t}.',syncFail:'KronoX svarade inte. Ditt sparade schema finns kvar.',tryAgain:'Försök igen',noDay:'Inga pass den här dagen 🎉',weekN:'Vecka {n}',pullRefresh:'Dra för att uppdatera',releaseRefresh:'Släpp för att uppdatera',refreshing:'Uppdaterar…',lastClass:'ditt förra pass',walkFrom:'{m} min promenad från {r} · {g} min rast',tight:'Tajt',share:'Dela',shareText:'Vi ses vid {r}',copied:'Länken kopierad',recent:'Senaste sökningar',courseRooms:'Salar för {c}',didMean:'Menade du',vib:'Vibrera vid tryck',onbHi:'Välkommen till MDU Navigator',onbCampus:'Vilket campus studerar du på?',both:'Båda',onbNext:'Nästa',skip:'Hoppa över',onbLater:'Senare',onbSched:'Lägg till ditt schema',onbHome:'Ha den på hemskärmen',onbHomeD:'Den öppnas som en app och fungerar utan internet.',done:'Klar',gotIt:'Uppfattat',onbLaterHint:'Du kan göra det senare under fliken Student.',onbLang:'Språk',srRoute:'Väg till {r}: {n} steg, cirka {m} min',floorN:'Plan {n}',prevWeek:'Förra veckan',nextWeek:'Nästa vecka',roomTba:'Sal ej klar',roomTbaLong:'Ingen sal bokad i KronoX än',progress:'Hur mycket av passet som har gått',progDone:'{p} % klart',laterSame:'Senare samma dag',goTo:'Visa vägen till',online:'Online',deadline:'Inlämning',nextDeadline:'Nästa inlämning',
   notMapped:'Salen finns inte på kartan än',example:'Exempel',yours:'Ditt schema',
@@ -94,7 +94,7 @@ const FACN={'Main entrance':['Main entrance','Huvudentré'],'Restaurang':['Resta
  'Defibrillator':['Defibrillator','Hjärtstartare'],'University Library':['University Library','Universitetsbiblioteket'],'Silent reading room':['Silent reading room','Tyst läsesal'],
  'Stilla rum':['Quiet room','Stilla rum'],'Calm room':['Calm room','Stilla rum'],'Student Health':['Student Health','Studenthälsan'],'Student Health Service':['Student Health Service','Studenthälsan'],
  'Rest room':['Rest room','Vilrum'],'Student Centre':['Student Centre','Studenttorget'],'Lunch area':['Lunch area','Lunchplats'],'Reading area':['Reading area','Läsplatser'],
- 'Mälartorget':['Mälartorget','Mälartorget'],'Idélab':['Idélab','Idélab']};
+ 'Mälartorget':['Mälartorget','Mälartorget'],'Idélab':['Idélab','Idélab'],'Division of Education Support':['Division of Education Support','Utbildningsstöd'],'Communication Unit':['Communication Unit','Kommunikationsenheten'],'Division of Management Support':['Division of Management Support','Ledningsstöd'],'Board room':['Board room','Styrelserum']};
 const dn=r=>r.kind==='wc'?'WC':(FACN[r.id]?FACN[r.id][lang==='sv'?1:0]:r.id);
 
 let lang='en';
@@ -121,7 +121,7 @@ const BYCODE=new Map(), BYKEY=new Map(ROOMS.map(r=>[r.key,r]));
 for(const r of ROOMS){ if(!r.kind && !BYCODE.has(norm(r.id))) BYCODE.set(norm(r.id),r); }
 function bName(r){
   if(r.b==='E') return /^[ABC]\d-/.test(r.id)?r.id[0]:bShort('E');
-  if(r.b==='U') return /^T\d-/.test(r.id)?'T':'U';
+  if(r.b==='U') return /^T\d-/.test(r.id)||r.hus==='T'?'T':'U';
   return bShort(r.b);
 }
 const placeLabel=r=>`${t(r.campus)} · ${r.b==='X'?bLabel('X'):bName(r)} · ${t('floor')} ${r.floor}`;
@@ -140,7 +140,7 @@ const ROUTABLE=new Set(Object.keys(EDGES).map(k=>k[0]));
 function vlink(floors,ids,w=32){for(const id of ids)for(let i=0;i+1<floors.length;i++){const a=floors[i]+':'+id,b=floors[i+1]+':'+id;if(POS.has(a)&&POS.has(b))addEdge(a,b,w);}}
 vlink(['R1','R2','R3'],['stN','stC','stS']);
 vlink(['U1','U2','U3'],['stA','stB','stC','stE']);
-vlink(['U1','U2'],['stT']); // stairs by U2-273 in front of the library: floor 1 -> floor 2 only (comes out by the Zeta corridor)
+vlink(['U1','U2','U3'],['stT']); // stairs by U2-273 in front of the library: floors 1-2 (U/T) and up to T3 (landing by the lift) (comes out by the Zeta corridor)
 vlink(['U1','U2','U3'],['stTB']); // T Block's own stairwell (north-west corner) — the only way to T Block floor 3
 vlink(['E1','E2','E3','E4'],['stW','stE','stC','stS']);
 addEdge('U2:linkR','R3:ent_u',45); TRANS.set('U2:linkR|R3:ent_u','link');TRANS.set('R3:ent_u|U2:linkR','link');
@@ -686,7 +686,7 @@ function busHint(e){
 }
 
 /* ---------- Search ---------- */
-const KINDS={wc:'wc',cafe:'food',food:'food',quiet:'quiet',help:'help',aed:'aed',lib:'lib',entr:'entr'};
+const KINDS={wc:'wc',cafe:'food',food:'food',quiet:'quiet',help:'help',aed:'aed',lib:'lib',entr:'entr',office:'office'};
 const kindName=r=>r.kind?t(KINDS[r.kind]||r.kind):'';
 function itemRow(r){
   return `<button class="item" type="button" data-k="${esc(r.key)}"><span class="${r.kind||!/\d/.test(r.id)?'':'code'}" style="min-width:70px">${esc(dn(r))}</span><span class="s">${placeLabel(r)}</span><span class="tag ${canRoute(r)?'go':''}">${canRoute(r)?t('route'):t('mapOnly')}</span></button>`;
@@ -705,7 +705,7 @@ function renderSearch(){
     const list=ROOMS.filter(r=>r.campus===campus).sort((a,b)=>a.b.localeCompare(b.b)||a.floor-b.floor||a.id.localeCompare(b.id));
     res.innerHTML=h+list.slice(0,60).map(itemRow).join('');
   }else{
-    let list=ROOMS.filter(r=>norm(r.id).includes(s)||norm(r.id).replace('-','').includes(s)||(r.kind&&(norm(kindName(r)).includes(s)||norm(dn(r)).includes(s))));
+    let list=ROOMS.filter(r=>norm(r.id).includes(s)||norm(r.id).replace('-','').includes(s)||(r.kind&&(norm(kindName(r)).includes(s)||norm(dn(r)).includes(s)))||(FACN[r.id]&&FACN[r.id].some(n=>norm(n).includes(s))));
     list.sort((a,b)=>(a.campus===campus?0:1)-(b.campus===campus?0:1)||a.b.localeCompare(b.b)||a.floor-b.floor||a.id.localeCompare(b.id));
     let h='';
     // rooms used by a course you have added
@@ -734,7 +734,7 @@ function renderPlaces(){
    <table class="hours"><tr><th colspan="2">${t('hStudents')}</th></tr><tr><td>${t('hWeekdays')}</td><td class="code">05:30–22:00</td></tr><tr><td>${t('hWeekend')}</td><td class="code">06:30–22:00</td></tr>
    <tr><th colspan="2">${t('hComputer')}</th></tr><tr><td>${t('hEveryDay')}</td><td class="code">07:00–22:00</td></tr>
    <tr><th colspan="2">${t('hPublic')}</th></tr><tr><td>${t('hMonThu')}</td><td class="code">08:00–19:00</td></tr><tr><td>${t('hFri')}</td><td class="code">08:00–16:00</td></tr></table></div>`;
-  const groups=[['entr',r=>r.kind==='entr'],['help',r=>r.kind==='help'],['food',r=>r.kind==='cafe'||r.kind==='food'],['lib',r=>r.kind==='lib'],['quiet',r=>r.kind==='quiet'],['wc',r=>r.kind==='wc'],['aed',r=>r.kind==='aed'],
+  const groups=[['entr',r=>r.kind==='entr'],['help',r=>r.kind==='help'||r.kind==='office'],['food',r=>r.kind==='cafe'||r.kind==='food'],['lib',r=>r.kind==='lib'],['quiet',r=>r.kind==='quiet'],['wc',r=>r.kind==='wc'],['aed',r=>r.kind==='aed'],
     ['halls',r=>!r.kind&&/^[A-Z][a-zé]/.test(r.id)]];
   h+=groups.map(([k,f])=>{const L=ROOMS.filter(r=>r.campus===campus&&f(r));if(!L.length)return'';
     return `<div class="card cat"><h3 class="cath">${tileHtml(PLACE_TILE[k])}<span style="flex:1">${t(k)}</span><span class="cnt">${L.length}</span></h3><div class="list">${L.map(itemRow).join('')}</div></div>`}).join('')+`<p class="note">${t('dataNote')}</p>`;
@@ -803,10 +803,10 @@ function renderMap(){
   if(route){
     for(const s of route.segs.filter(s=>s.fk===floor)){
       const pts=s.pts.map(p=>p.x+','+p.y).join(' ');
-      el('polyline',{points:pts,fill:'none',stroke:'#ffffff',"stroke-width":8,"stroke-linecap":"round","stroke-linejoin":"round",opacity:.9},svg);
+      el('polyline',{points:pts,fill:'none',stroke:'#ffffff',"stroke-width":4.5,"stroke-linecap":"round","stroke-linejoin":"round",opacity:.75},svg);
       // see-through route: a blue line blended with the map (multiply), so room numbers under it stay readable
-      el('polyline',{points:pts,fill:'none',stroke:'var(--route)',"stroke-width":5,opacity:.28,"stroke-linecap":"round","stroke-linejoin":"round",class:'routebase'},svg);
-      el('polyline',{points:pts,fill:'none',stroke:'var(--route)',"stroke-width":1.8,opacity:.55,"stroke-dasharray":"5 7","stroke-linecap":"round",class:'routeline routebase'},svg);
+      el('polyline',{points:pts,fill:'none',stroke:'#2fe04f',"stroke-width":3,opacity:.6,"stroke-linecap":"round","stroke-linejoin":"round",class:'routebase'},svg);
+      el('polyline',{points:pts,fill:'none',stroke:'#0a5c1f',"stroke-width":1.3,opacity:.9,"stroke-dasharray":"4 6","stroke-linecap":"round",class:'routeline routebase'},svg);
     }
     for(const s of route.marks.filter(s=>s.fk===floor)){
       el('circle',{cx:s.x,cy:s.y,r:8,fill:'var(--stair)',stroke:'#fff',"stroke-width":2},svg);
@@ -960,6 +960,7 @@ function renderSheet(){
   const kind=kindName(target);
   const canMin=canRoute(target)&&route&&!route.same;
   let h=`${canMin?`<button class="grab" type="button" id="grab" aria-label="${sheetMin?t('showStepsA'):t('hideStepsA')}"></button>`:'<div class="grab"></div>'}<div class="row wrap head"><span class="dot" style="background:var(--target)"></span><h2 class="${target.kind?'':'code'}" style="flex:1">${esc(dn(target))}</h2><span class="muted small">${kind&&target.kind!=='wc'?esc(kind)+' · ':''}${placeLabel(target)}</span></div>`;
+  if(target.note) h+=`<p class="small muted" style="margin:6px 0 0">ℹ️ ${t(target.note)}</p>`;
   if(!canRoute(target)){h+=`<p class="small" style="margin:10px 0 0">${t('noRoute',{p:placeLabel(target)})}</p>`;}
   else{
     h+=`<button class="from" type="button" id="fromBtn"><span class="dot" style="background:var(--start)"></span><span style="flex:1"><span class="muted small">${t('from')}: </span>${startLabel()}${effectiveStart()&&effectiveStart().auto?` <span class="badge">${t('lastClass')}</span>`:''}</span><span class="small" style="color:var(--accent);font-weight:600">${t('change')}</span></button>`;
